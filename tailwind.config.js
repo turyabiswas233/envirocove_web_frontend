@@ -9,7 +9,7 @@ export default {
       borderColor: {
         "default-black": "#4E4A4A",
         "light-gray": "#8F939D",
-        "border-gray": "#E1DDDD",
+        "border-gray": "#D3D3D3",
       },
       colors: {
         "default-gray": "#4B5059",

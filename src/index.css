@@ -7,3 +7,9 @@
 body {
   font-family: "Poppins", sans-serif;
 }
+.circle {
+  @apply rounded-full w-5 h-5 border border-border-gray;
+}
+.circle.selected {
+  @apply bg-default-green;
+}
