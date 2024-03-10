@@ -7,9 +7,9 @@ function App() {
   return (
     <>
       <div>
-        {/* <Login /> done*/}
-        {/* <Onboard /> done*/}
-        {/* <Consumer /> done */}
+        <Login />
+        <Onboard />
+        <Consumer />
         <Product />
       </div>
     </>

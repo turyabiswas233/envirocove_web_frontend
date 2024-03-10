@@ -79,7 +79,7 @@ const ItemCart = ({ image, title, price, imgAlt }) => {
   return (
     <div className="bg-white rounded-[20px] p-2 text-left">
       <img
-        className="rounded-2xl"
+        className="rounded-2xl w-full mx-auto"
         src={image}
         alt={imgAlt || "Image.png"}
         width={300}
