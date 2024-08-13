@@ -1,28 +1,68 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowBack, DottedLine } from "./icons/icons";
 import Pic from "../assets/triod.png";
 import Button from "./Button";
+import { Link, useNavigate } from "react-router-dom";
 function CheckoutShip() {
+  const navigate = useNavigate();
+  const [address, setAddress] = useState(
+    "Rajshahi Cantonment Gate, Holding No- 1202/A, Cantonment, Rajshahi"
+  );
+  const [fullName, setFullName] = useState("Shihab Bin Toriq");
+  const [willChange, setChange] = useState(false);
   return (
-    <div className="bg-white p-5 w-auto min-h-screen">
+    <div className="bg-white p-5 w-auto min-h-screen flex flex-col justify-between">
       {/* header */}
 
       <h2 className="font-bold text-left text-3xl w-fit flex items-center gap-4 py-6">
-        <ArrowBack />
+        <Link to={"/mycart"}>
+          <ArrowBack />
+        </Link>
         Checkout
       </h2>
       <div className="my-2">
         <header className="flex justify-between items-center my-4 font-semibold">
           <p>Shipping address</p>
-          <p className="text-default-green">Change</p>
+          <button
+            className="text-default-green"
+            onClick={() => setChange((p) => !p)}
+          >
+            {willChange == true ? "Update" : "Change"}
+          </button>
         </header>
 
         {/* address */}
         <div className="rounded-3xl bg-bg-gray p-5">
-          <p className="font-medium">Shihab Bin Toriq</p>
-          <p className="font-normal">
-            Rajshahi Cantonment Gate, Holding No- 1202/A, Cantonment, Rajshahi
-          </p>
+          <p className="font-medium">{fullName}</p>
+          <p className="font-normal">{address}</p>
+          {willChange && (
+            <div className="p-2 grid gap-4 bg-white rounded-md mt-5">
+              <section className="grid grid-cols-6 gap-3 items-center">
+                <label className="text-end" htmlFor="fn">
+                  FullName :
+                </label>
+                <input
+                  className="col-span-5 py-2 px-3 rounded-md bg-bg-gray"
+                  type="text"
+                  placeholder="Enter Full Name"
+                  id="fn"
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+              </section>
+              <section className="grid grid-cols-6 gap-3 items-center">
+                <label className="text-end" htmlFor="ad">
+                  Address :
+                </label>
+                <input
+                  className="col-span-5 py-2 px-3 rounded-md bg-bg-gray"
+                  type="text"
+                  id="ad"
+                  placeholder="Enter Delivery Address"
+                  onChange={(e) => setAddress(e.target.value)}
+                />
+              </section>
+            </div>
+          )}
         </div>
 
         {/* items */}
@@ -54,7 +94,13 @@ function CheckoutShip() {
           <span className="font-medium text-tBlack">৳ 00.00</span>
         </p>
       </div>
-      <Button classes={"w-full text-center py-5 mt-5"} text={"Continue"} />
+      <Button
+        classes={"w-full text-center py-5 mt-5"}
+        text={"Continue"}
+        onclick={() => {
+          navigate("/checkout/pay");
+        }}
+      />
     </div>
   );
 }

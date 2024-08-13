@@ -4,12 +4,28 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  padding: 0%;
+  margin: 0%;
+  box-sizing: border-box;
+}
 body {
   font-family: "Poppins", sans-serif;
+  background: #fff;
+  color: #000;
 }
 .circle {
   @apply rounded-full w-5 h-5 border border-border-gray;
 }
 .circle.selected {
   @apply bg-default-green;
+}
+.signup > div.input{
+  @apply grid grid-cols-1 gap-1;
+}
+.signup > div.input > label{
+  @apply font-medium pl-3 text-title;
+}
+.signup > div.input > input{
+  @apply p-5 border border-neutral-400 placeholder:text-neutral-400 rounded-3xl focus-within:outline outline-offset-0 focus-within:border-transparent focus-within:outline-green-500 outline-none;
 }

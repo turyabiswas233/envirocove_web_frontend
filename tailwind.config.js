@@ -18,7 +18,7 @@ export default {
         "default-green": "#4EB34F",
         tBlack: "#212121",
         place: "#858585",
-        "opa-green": "#EFF5EF",
+        "opa-green": "#e0f5e0",
       },
     },
   },

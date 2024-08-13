@@ -1,23 +1,29 @@
 import React, { useState } from "react";
 import { Account, CartIcon } from "./icons/icons";
 import Pic from "../assets/triod.png";
+import { useNavigate } from "react-router-dom";
 function Consumer() {
   const [tab, setTab] = useState(tabs[0]);
+  const navigate = useNavigate();
   const items = [
     {
       title: "Bridge Diode 2W10 (Heady)",
       price: 48.19,
       img: Pic,
+      id: 5411
     },
     {
       title: "Zener Diode 1N4733 5.1V",
       price: 160.99,
       img: Pic,
+      id: 1650
+
     },
     {
       title: "L7809 Voltage Regulator",
       price: 23.33,
       img: Pic,
+      id: 3415
     },
   ];
   return (
@@ -66,6 +72,9 @@ function Consumer() {
               image={item.img}
               price={item.price}
               title={item.title}
+              onClick={() => {
+                navigate("/product/" + item.id);
+              }}
             />
           );
         })}
@@ -73,11 +82,11 @@ function Consumer() {
     </div>
   );
 }
-const ItemCart = ({ image, title, price, imgAlt }) => {
+const ItemCart = ({ image, title, price, imgAlt, onClick }) => {
   /* you may route onClick each-cart. I have made just a single cart  */
 
   return (
-    <div className="bg-white rounded-[20px] p-2 text-left">
+    <div className="bg-white rounded-[20px] p-2 text-left" onClick={onClick}>
       <img
         className="rounded-2xl w-full mx-auto"
         src={image}

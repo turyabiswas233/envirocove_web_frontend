@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "./Button";
+import { useNavigate } from "react-router-dom";
 const CardSelect = ({ id, select = false, title, text, onClick }) => {
   return (
     <div
@@ -26,6 +27,10 @@ const CardSelect = ({ id, select = false, title, text, onClick }) => {
   );
 };
 const Onboard = () => {
+  const navigate = useNavigate();
+
+  const [selectedOption, setSelectedOption] = useState("");
+
   const [data, setData] = useState([
     {
       title: "As a vendor",
@@ -38,7 +43,22 @@ const Onboard = () => {
       select: false,
     },
   ]);
-  const count = data.filter((pre) => pre.select === true).length;
+  const handleSelect = (id) => {
+    setData((ele) => {
+      const newArrar = ele.map((e, eid) => {
+        if (eid == id) return { ...e, select: true };
+        else return { ...e, select: false };
+      });
+      return newArrar;
+    });
+  };
+
+  useEffect(() => {
+    setSelectedOption(
+      (e) => data.find((ele) => ele.select == true)?.title || ""
+    );
+  }, [data]);
+
   return (
     <div className="py-32 px-4 font-poppins w-auto h-screen overflow-y-auto bg-white">
       <div className="header grid grid-cols-1 gap-5">
@@ -55,14 +75,16 @@ const Onboard = () => {
               title={ele.title}
               select={ele.select}
               text={ele.text}
+              onClick={(e) => handleSelect(id)}
             />
           );
         })}
 
         <Button
           text={"Sign up"}
+          onclick={() => navigate("/signup")}
           classes={"w-full py-3 font-semibold"}
-          disabled={count == 0}
+          disabled={selectedOption.length == 0}
           // icon={<Google />}
         />
       </div>

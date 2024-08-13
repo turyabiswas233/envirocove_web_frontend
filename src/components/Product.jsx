@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Account,
   AddCart,
   Back,
   Bag,
@@ -10,12 +11,14 @@ import {
 } from "./icons/icons";
 import Pic from "../assets/triod.png";
 import Button from "./Button";
+import { Link, useParams } from "react-router-dom";
 function Product() {
   const price = 160.49;
+  const { id } = useParams();
   const Counter = () => {
     const [num, setNum] = useState(1);
     const increament = () => {
-      setNum((pre) => pre + 1);
+      if (num < 10) setNum((pre) => pre + 1);
     };
 
     const decreament = () => {
@@ -34,9 +37,10 @@ function Product() {
         </button>
         <p>{num}</p>
         <button
-          className="bg-white rounded-full p-5 w-5 h-5 flex justify-center items-center  "
+          className="bg-white rounded-full p-5 w-5 h-5 flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed "
           type="button"
           onClick={increament}
+          disabled={num == 10}
         >
           +
         </button>
@@ -48,12 +52,17 @@ function Product() {
       {/* header */}
       <div className="header bg-bg-gray py-10 px-4">
         <div className="btns flex justify-between">
-          <button className="rounded-3xl px-4 py-2 text-base font-medium flex gap-2 items-center border  ">
-            <Back /> Back
+          <button className="rounded-3xl px-4 py-2 text-base font-medium border">
+            <Link className="flex items-center gap-2" to={"/home"}>
+              <Back /> Back
+            </Link>
           </button>
-          <button className="rounded-full border  border-border-gray p-2 w-10 h-10 justify-center items-center flex">
+          <Link
+            className="rounded-full border  border-border-gray p-2 w-10 h-10 justify-center items-center flex"
+            to={"/mycart"}
+          >
             <CartIcon />
-          </button>
+          </Link>
         </div>
         <div className="w-full">
           <img
@@ -88,14 +97,17 @@ function Product() {
       <div className="p-4">
         <p className="font-medium pt-2">
           8 Pins KA331 / VD38 Voltage to Frequency Converter LC
+          <br />
+          ID:{id}
         </p>
         {/* vendor details */}
         <div className="border-b border-x-default-black py-6">
           <p className="font-semibold">Vendor</p>
           <section className="flex justify-between items-center">
             {/* <img src="" alt="" /> */}
-            <div className="p-8 w-5 h-5 bg-bg-gray rounded-full">
+            <div className="p-3 bg-bg-gray rounded-full">
               {/* alternate of image */}
+              <Account />
             </div>
             {/* vendor details */}
             <div>
