@@ -54,7 +54,7 @@ function VerifyID() {
     );
   };
   return (
-    <div className="py-14 px-4 font-poppins w-auto   overflow-y-auto space-y-10">
+    <div className="py-14 px-4  w-auto   overflow-y-auto space-y-10">
       <Link to={"/"}>
         <ArrowBack />
       </Link>

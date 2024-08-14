@@ -6,9 +6,9 @@ import { Link, useNavigate } from "react-router-dom";
 function CheckoutShip() {
   const navigate = useNavigate();
   const [address, setAddress] = useState(
-    "Rajshahi Cantonment Gate, Holding No- 1202/A, Cantonment, Rajshahi"
+    ""
   );
-  const [fullName, setFullName] = useState("Shihab Bin Toriq");
+  const [fullName, setFullName] = useState("");
   const [willChange, setChange] = useState(false);
   return (
     <div className="bg-white p-5 w-auto min-h-screen flex flex-col justify-between">
@@ -33,12 +33,12 @@ function CheckoutShip() {
 
         {/* address */}
         <div className="rounded-3xl bg-bg-gray p-5">
-          <p className="font-medium">{fullName}</p>
-          <p className="font-normal">{address}</p>
+          <p className="font-medium">{fullName || 'Your Name'}</p>
+          <p className="font-normal">{address || 'Your Home/Delivery Address'}</p>
           {willChange && (
             <div className="p-2 grid gap-4 bg-white rounded-md mt-5">
-              <section className="grid grid-cols-6 gap-3 items-center">
-                <label className="text-end" htmlFor="fn">
+              <section className="grid">
+                <label className="text-sm" htmlFor="fn">
                   FullName :
                 </label>
                 <input
@@ -49,8 +49,8 @@ function CheckoutShip() {
                   onChange={(e) => setFullName(e.target.value)}
                 />
               </section>
-              <section className="grid grid-cols-6 gap-3 items-center">
-                <label className="text-end" htmlFor="ad">
+              <section className="grid">
+                <label className="text-sm" htmlFor="ad">
                   Address :
                 </label>
                 <input
@@ -81,24 +81,25 @@ function CheckoutShip() {
 
       <div className="summary grid gap-2">
         <p className="font-semibold">Summary</p>
-        <p className="flex justify-between items-center font-light text-title">
+        <p className="grid grid-cols-3 items-center font-light text-title">
           Subtotal <DottedLine />{" "}
-          <span className="font-medium text-tBlack">৳ 262.08</span>
+          <span className="font-medium text-tBlack text-right">৳ 262.08</span>
         </p>
-        <p className="flex justify-between items-center font-light text-title">
+        <p className="grid grid-cols-3 items-center font-light text-title">
           Shipping fee <DottedLine />{" "}
-          <span className="font-medium text-tBlack">৳ 150.00</span>
+          <span className="font-medium text-tBlack text-right">৳ 150.00</span>
         </p>
-        <p className="flex justify-between items-center font-light text-title">
+        <p className="grid grid-cols-3 items-center font-light text-title">
           Discount <DottedLine />{" "}
-          <span className="font-medium text-tBlack">৳ 00.00</span>
+          <span className="font-medium text-tBlack text-right">৳ 00.00</span>
         </p>
       </div>
       <Button
         classes={"w-full text-center py-5 mt-5"}
         text={"Continue"}
         onclick={() => {
-          navigate("/checkout/pay");
+          if(fullName.length==0 || address.length == 0) alert("Please provide your full name and home/delivery address.")
+          else navigate("/checkout/pay");
         }}
       />
     </div>

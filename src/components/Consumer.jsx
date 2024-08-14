@@ -27,7 +27,7 @@ function Consumer() {
     },
   ];
   return (
-    <div className="py-10 px-4 font-poppins w-auto h-screen overflow-y-auto bg-bg-gray">
+    <div className="py-10 px-4  w-auto h-screen overflow-y-auto bg-bg-gray">
       {/* header */}
       <div className="header flex justify-between gap-5">
         <h2 className="font-bold text-left text-3xl w-fit px-3">Discover</h2>

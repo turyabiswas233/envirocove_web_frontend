@@ -5,11 +5,12 @@ export default {
     extend: {
       backgroundColor: {
         "bg-gray": "#F6F6F6",
+        totamo: "#F26E63"
       },
       borderColor: {
         "default-black": "#4E4A4A",
         "light-gray": "#8F939D",
-        "border-gray": "#D3D3D3",
+        "border-gray": "#E2E2E2",
       },
       colors: {
         "default-gray": "#4B5059",
@@ -18,8 +19,11 @@ export default {
         "default-green": "#4EB34F",
         tBlack: "#212121",
         place: "#858585",
-        "opa-green": "#e0f5e0",
+        "opa-green": "#eff5ef",
       },
+      borderRadius: {
+        cl: "22px"
+      }
     },
   },
   plugins: [],

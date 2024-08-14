@@ -15,7 +15,7 @@ function VerifyPhone() {
     }
   }, [resentOTP]);
   return (
-    <div className="py-14 px-4 font-poppins w-auto   overflow-y-auto space-y-12">
+    <div className="py-14 px-4  w-auto   overflow-y-auto space-y-12">
       <Link to={"/"}>
         <ArrowBack />
       </Link>
@@ -53,6 +53,7 @@ function VerifyPhone() {
               id="otp"
               required
               placeholder="Enter OTP"
+              autoComplete="one-time-code"
             />
             {/* ## otp sender ## */}
             <span

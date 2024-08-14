@@ -2,13 +2,19 @@ import React, { useEffect, useState } from "react";
 import { ArrowBack, Bkash, CreditCard, Nagad } from "./icons/icons";
 import Button from "./Button";
 import { Link } from "react-router-dom";
+import check from "/images/icons/check.svg";
 const randomID =
   JSON.parse(localStorage.getItem("randomID")) ||
   (Math.random() * 10000).toPrecision(4);
 localStorage.setItem("randomID", JSON.stringify(randomID));
 
 function CheckoutPay() {
-  const [sid, setSelect] = useState(-1);
+  const [sid, setSelect] = useState(-1); // This can be used as the choosen option of payment method.
+  /*
+    0 -> Credit Card
+    1 -> Bkash
+    2 -> Nagad
+  */
   const [options, setOptions] = useState([
     {
       icon: <CreditCard />,
@@ -87,7 +93,9 @@ function CheckoutPay() {
 const Option = ({ icon, name, select = false, toggle }) => {
   return (
     <div
-      className="rounded-2xl border border-border-gray flex justify-between items-center p-4 my-2 hover:bg-bg-gray cursor-pointer transition-colors ease-in"
+      className={`rounded-2xl border ${
+        select == true ? "border-tBlack" : "border-border-gray"
+      } flex justify-between items-center p-5 my-2 hover:bg-bg-gray cursor-pointer transition-colors ease-in`}
       onClick={toggle}
     >
       <div className="method flex items-center gap-2">
@@ -95,10 +103,13 @@ const Option = ({ icon, name, select = false, toggle }) => {
         <p className="font-semibold">{name}</p>
       </div>
       <div
-        className={`circle ${
-          select == true && "selected"
-        } flex justify-center items-center`}
-      ></div>
+        className={`${
+          !select ? "bg-white" : "bg-black"
+        } circle transition-colors`}
+      >
+        <div className="w-2 h-1 origin-left translate-y-1.5 translate-x-1 rounded-full bg-white rotate-45"></div>
+        <div className="w-3 h-1 origin-left translate-y-2 translate-x-1.5 rounded-full bg-white -rotate-45"></div>
+      </div>
     </div>
   );
 };

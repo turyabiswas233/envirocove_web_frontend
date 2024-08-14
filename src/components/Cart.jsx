@@ -6,11 +6,11 @@ import { Link, useNavigate } from "react-router-dom";
 const Counter = ({ number, id, setItemNumber }) => {
   const [num, setNum] = useState(number);
   const increament = () => {
-    if (num < 8) setNum((pre) => pre + 1);
+    if (num < 7) setNum((pre) => pre + 1);
   };
 
   const decreament = () => {
-    if (num > 0) setNum((pre) => pre - 1);
+    if (num > 1) setNum((pre) => pre - 1);
   };
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const Counter = ({ number, id, setItemNumber }) => {
         type="button"
         className="bg-bg-gray rounded-full p-3 w-4 h-4 flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={decreament}
-        disabled={num == 0}
+        disabled={num == 1}
       >
         -
       </button>
@@ -38,7 +38,7 @@ const Counter = ({ number, id, setItemNumber }) => {
         className="bg-bg-gray rounded-full p-3 w-4 h-4 flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
         type="button"
         onClick={increament}
-        disabled={num == 8}
+        disabled={num == 7}
       >
         +
       </button>
@@ -101,11 +101,11 @@ const Cart = () => {
     });
   });
   return (
-    <div className="pt-5 font-poppins w-auto min-h-screen bg-bg-gray flex flex-col justify-between">
+    <div className="pt-5 w-auto min-h-screen bg-bg-gray flex flex-col justify-between">
       {/* header */}
-      <div className="m-4 flex justify-between gap-5">
-        <h2 className="font-bold text-left text-3xl w-fit px-3 flex items-center gap-4">
-          <Link to={"/home"}>
+      <div className="py-6 px-5 flex justify-between gap-5">
+        <h2 className="font-bold text-left text-3xl w-fit flex items-center gap-4">
+          <Link to={"/dashboard"}>
             <ArrowBack />
           </Link>
           Cart
@@ -141,15 +141,15 @@ const Cart = () => {
 
       <div className="float-end sticky bottom-0 w-full bg-bg-gray">
         <div className="totalPrice px-10 py-5 text-title/90">
-          <section className="flex justify-between items-center">
+          <section className="grid grid-cols-3 items-center">
             <p>Subtotal</p>
             <DottedLine />
-            <p>৳ {totalPrice.toFixed(2)}</p>
+            <p className="text-right">৳ {totalPrice.toFixed(2)}</p>
           </section>
-          <section className="flex justify-between items-center">
+          <section className="grid grid-cols-3 items-center">
             <p>Discount</p>
             <DottedLine />
-            <p>৳ 00.00</p>
+            <p className="text-right">৳ 00.00</p>
           </section>
         </div>
         <div className="bg-white px-5 py-8 flex justify-between items-center  rounded-t-3xl">

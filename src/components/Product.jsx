@@ -18,7 +18,7 @@ function Product() {
   const Counter = () => {
     const [num, setNum] = useState(1);
     const increament = () => {
-      if (num < 10) setNum((pre) => pre + 1);
+      if (num < 7) setNum((pre) => pre + 1);
     };
 
     const decreament = () => {
@@ -40,7 +40,7 @@ function Product() {
           className="bg-white rounded-full p-5 w-5 h-5 flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed "
           type="button"
           onClick={increament}
-          disabled={num == 10}
+          disabled={num == 7}
         >
           +
         </button>
@@ -53,7 +53,7 @@ function Product() {
       <div className="header bg-bg-gray py-10 px-4">
         <div className="btns flex justify-between">
           <button className="rounded-3xl px-4 py-2 text-base font-medium border">
-            <Link className="flex items-center gap-2" to={"/home"}>
+            <Link className="flex items-center gap-2" to={"/dashboard"}>
               <Back /> Back
             </Link>
           </button>

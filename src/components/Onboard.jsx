@@ -60,7 +60,7 @@ const Onboard = () => {
   }, [data]);
 
   return (
-    <div className="py-32 px-4 font-poppins w-auto h-screen overflow-y-auto bg-white">
+    <div className="py-32 px-4  w-auto h-screen overflow-y-auto bg-white">
       <div className="header grid grid-cols-1 gap-5">
         <h2 className="font-bold text-left text-3xl">
           How do you want to use the platform?
