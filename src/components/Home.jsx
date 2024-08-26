@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/auth";
 const CardSelect = ({ id, select = false, title, text, onClick }) => {
   return (
     <div
@@ -26,24 +27,33 @@ const CardSelect = ({ id, select = false, title, text, onClick }) => {
     </div>
   );
 };
-const Onboard = () => {
-  const navigate = useNavigate();
+const Home = () => {
+  const navi = useNavigate();
 
-  const [selectedOption, setSelectedOption] = useState("");
+  const [user] = useAuth();
 
+  useEffect(() => {
+    if (user) navi("/dashboard");
+  }, [user]);
+
+  const [selectedOption, setSelectedOption] = useState(1);
   const [data, setData] = useState([
     {
       title: "As a vendor",
       text: "I want to sell recycled items extracted from ewaste.",
+      type: "vendor",
       select: false,
     },
     {
       title: "As a consumer",
       text: "I want to sell recycled items extracted from ewaste.",
-      select: false,
+      type: "consumer",
+      select: true,
     },
   ]);
   const handleSelect = (id) => {
+    if (selectedOption === id) return;
+    setSelectedOption(id);
     setData((ele) => {
       const newArrar = ele.map((e, eid) => {
         if (eid == id) return { ...e, select: true };
@@ -53,14 +63,8 @@ const Onboard = () => {
     });
   };
 
-  useEffect(() => {
-    setSelectedOption(
-      (e) => data.find((ele) => ele.select == true)?.title || ""
-    );
-  }, [data]);
-
   return (
-    <div className="py-32 px-4  w-auto h-screen overflow-y-auto bg-white">
+    <div className="py-32 px-4 w-auto bg-white">
       <div className="header grid grid-cols-1 gap-5">
         <h2 className="font-bold text-left text-3xl">
           How do you want to use the platform?
@@ -71,6 +75,7 @@ const Onboard = () => {
         {data.map((ele, id) => {
           return (
             <CardSelect
+              key={id}
               id={"lorem"}
               title={ele.title}
               select={ele.select}
@@ -82,14 +87,18 @@ const Onboard = () => {
 
         <Button
           text={"Sign up"}
-          onclick={() => navigate("/signup")}
+          onclick={() =>
+            navi("/signup", {
+              state: {
+                type: data[selectedOption].type.toLowerCase(),
+              },
+            })
+          }
           classes={"w-full py-3 font-semibold"}
-          disabled={selectedOption.length == 0}
-          // icon={<Google />}
         />
       </div>
     </div>
   );
 };
 
-export default Onboard;
+export default Home;

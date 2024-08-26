@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import tag from "/images/icons/nav/tag.svg";
 import orders from "/images/icons/nav/orders.svg";
 import wallet from "/images/icons/nav/ewallet.svg";
@@ -7,7 +7,10 @@ import tagFill from "/images/icons/nav/active-icon/tag.svg";
 import ordersFill from "/images/icons/nav/active-icon/orders.svg";
 import walletFill from "/images/icons/nav/active-icon/ewallet.svg";
 import settingFill from "/images/icons/nav/active-icon/setting.svg";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import Load from "../Load";
+
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { account } from "../../api/index";
 function AdminPage() {
   const AdminNav = () => {
     const links = [
@@ -36,7 +39,7 @@ function AdminPage() {
     const willHide = loc.pathname.includes("addproduct");
 
     const [activeId, setActiveID] = useState(-1);
-    if(willHide) return;
+    if (willHide) return;
     return (
       <div className="fixed bottom-0 left-0 w-screen rounded-t-3xl px-4 bg-white shadow-slate-800 shadow-xl">
         <ul className="grid grid-cols-4 gap-2 justify-center">
@@ -77,9 +80,50 @@ function AdminPage() {
       </div>
     );
   };
+  const navi = useNavigate();
+  const [load, setLoad] = useState(true);
+  useEffect(() => {
+    try {
+      account.core
+        .isVendor()
+        .then((res) => res.json())
+        .then((d) => {
+          if (d?.type === "vender") {
+            return;
+          }
+          navi("/", {
+            state: {
+              adminError: "You are not a vendor user",
+            },
+          })
+        })
+        .catch((e) => {
+          console.log(e);
+          navi("/dashboard", {
+            state: {
+              adminError: "You are not a vendor user",
+            },
+          });
+        })
+        .finally(() => {
+          setLoad(false);
+        });
+    } catch (error) {
+      console.log(error);
+      navi("/dashboard", {
+        state: {
+          adminError: "You are not a vendor user",
+        },
+      });
+    } finally {
+      setLoad(false);
+    }
+  }, []);
+
   return (
     <div className="bg-bg-gray w-full h-screen overflow-y-auto">
       <Outlet />
+      {load && <Load />}
       <AdminNav />
     </div>
   );

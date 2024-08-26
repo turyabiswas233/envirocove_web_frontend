@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Google } from "./icons/icons";
 import Button from "./Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { account } from "../api/index";
 function Login() {
+  const navigate = useNavigate();
   const [resentOTP, setOTPtimer] = useState(0);
   const [userInfo, setInfo] = useState({
     phone: "",
@@ -16,9 +18,39 @@ function Login() {
       return () => clearInterval(loop);
     }
   }, [resentOTP]);
+
   function handleInput(e) {
     setInfo((pre) => ({ ...pre, [e.target.name]: e.target.value }));
   }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    account
+      .login({
+        username: userInfo.phone || "",
+        password: userInfo.otp || "",
+      })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res?.details);
+        if (res.token) {
+          localStorage.removeItem("TOKEN");
+          setTimeout(() => {
+            localStorage.setItem("TOKEN", res.token);
+          }, 2000);
+          alert(`You have logged in as ${res.username}`);
+          if (!res.is_active) {
+            alert(
+              "But your account may be disabled for a while. So you are going to be logged out"
+            );
+            localStorage.clear();
+            navigate("/");
+          }
+        }
+      })
+      .catch((er) => console.log("er", er));
+  }
+
   return (
     <div className="py-32 px-4  w-auto overflow-y-auto">
       <div className="header grid grid-cols-1 gap-5">
@@ -36,7 +68,7 @@ function Login() {
         <div className="line"></div>
       </div>
       <div className="my-12 text-title">
-        <form className="signup grid gap-5">
+        <form className="signup grid gap-5" onSubmit={handleSubmit}>
           <div className="input">
             <label htmlFor="phone">Phone number</label>
             <div className="border border-neutral-400 placeholder:text-neutral-400 px-5 py-3 rounded-3xl focus-within:outline outline-offset-0 focus-within:border-transparent focus-within:outline-green-500 outline-none flex items-center overflow-x-hidden">
@@ -47,14 +79,14 @@ function Login() {
                 type="text"
                 id="phone"
                 required
-                placeholder="1768952448"
+                placeholder="1768952448 | username"
                 name="phone"
                 value={userInfo.phone}
                 onChange={handleInput}
                 onKeyDown={(e) => {
-                  if (e.key < "0" || e.key > "9") {
-                    if (e.key != "Backspace") e.preventDefault();
-                  }
+                  // if (e.key < "0" || e.key > "9") {
+                  //   if (e.key != "Backspace") e.preventDefault();
+                  // }
                 }}
               />
             </div>
@@ -67,13 +99,13 @@ function Login() {
               required
               placeholder="Enter OTP"
               name="otp"
-              maxLength={6}
+              minLength={6}
               value={userInfo.otp}
               onChange={handleInput}
               onKeyDown={(e) => {
-                if (e.key < "0" || e.key > "9") {
-                  if (e.key != "Backspace") e.preventDefault();
-                }
+                // if (e.key < "0" || e.key > "9") {
+                //   if (e.key != "Backspace") e.preventDefault();
+                // }
               }}
             />
             {/* ## otp sender ## */}
@@ -95,7 +127,7 @@ function Login() {
             classes={"py-5 my-2 font-medium text-lg"}
             text={"Login"}
             type={"submit"}
-            disabled
+            disabled={userInfo.phone.length <= 3 || userInfo.otp.length < 6}
           />
           <p className="text-center">
             Don&apos;t have an account?{" "}

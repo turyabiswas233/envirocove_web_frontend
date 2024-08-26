@@ -20,7 +20,7 @@ import AdminHome from "./components/admin/Home.jsx";
 import AddProduct from "./components/admin/AddProduct.jsx";
 import Orders from "./components/admin/Orders.jsx";
 import AdminPage from "./components/admin/AdminPage.jsx";
-import Onboard from "./components/Onboard.jsx";
+import Home from "./components/Home.jsx";
 
 const rootRouter = createBrowserRouter([
   {
@@ -38,7 +38,7 @@ const rootRouter = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <Onboard />,
+        element: <Home />,
       },
       {
         path: "/dashboard",

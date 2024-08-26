@@ -152,7 +152,7 @@ function AdminHome() {
 
 const Message = ({ details }) => {
   return (
-    <div className="bg-white rounded-xl p-3 grid my-2 hover:bg-horizon transition-colors ease-in-out cursor-default">
+    <div className="bg-white/70 backdrop-blur-md rounded-xl p-3 grid my-2 hover:bg-horizon/50 transition-colors ease-in-out cursor-default">
       <p className="text-lg text-default-gray font-semibold">{details?.name}</p>
       <p className="text-sm text-default-gray/80 font-normal">
         {details?.text}
