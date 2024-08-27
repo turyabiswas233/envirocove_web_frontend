@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Account, ArrowBack, DottedLine } from "./icons/icons";
 import Pic from "../assets/triod.png";
 import Button from "./Button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { product } from "../api/index";
+import { useAuth } from "../context/auth";
+
 const Counter = ({ number, id, setItemNumber }) => {
   const [num, setNum] = useState(number);
   const increament = () => {
@@ -14,13 +17,26 @@ const Counter = ({ number, id, setItemNumber }) => {
   };
 
   useEffect(() => {
-    setItemNumber((pre) => {
-      const newList = pre?.map((e, eid) => {
-        if (eid != id) return e;
-        else return { ...e, itemQuantity: num };
+    const cartItem = JSON.parse(localStorage.getItem("myCart"));
+    if (Array.isArray(cartItem)) {
+      let findCur = cartItem.findIndex((ele) => ele?.productId === id);
+      localStorage.setItem(
+        "myCart",
+        JSON.stringify(
+          cartItem.map((ele, ei) =>
+            ei !== findCur ? ele : { ...ele, quantity: num }
+          )
+        )
+      );
+
+      setItemNumber((pre) => {
+        const newList = pre?.map((e) => {
+          if (e.productId != id) return e;
+          else return { ...e, quantity: num };
+        });
+        return newList;
       });
-      return newList;
-    });
+    }
   }, [num]);
 
   return (
@@ -45,7 +61,11 @@ const Counter = ({ number, id, setItemNumber }) => {
     </div>
   );
 };
-const EachCart = ({ price = 0, title, number, id, setItemNumber }) => {
+const EachCart = ({ id, number, price, title, setItemNumber, setTotal }) => {
+  useEffect(() => {
+    setTotal(0);
+    setTotal((pre) => pre + price);
+  }, [price]);
   return (
     <section
       className="flex justify-between gap-2 items-center my-4"
@@ -72,107 +92,133 @@ const EachCart = ({ price = 0, title, number, id, setItemNumber }) => {
   );
 };
 const Cart = () => {
-  const [totalPrice, setPrice] = useState(0);
   const navigate = useNavigate();
-  const [data, setData] = useState([
-    {
-      img: Pic,
-      title: "8 Pins KA331 / VD38 Voltage to Frequency Converter LC",
-      price: 162.33,
-      itemQuantity: 3,
-    },
-    {
-      img: Pic,
-      title: "Dingdong Tone Doorbell Music Voice Module",
-      price: 99.75,
-      itemQuantity: 1,
-    },
-    {
-      img: Pic,
-      title: "8 Pins KA331 / VD38 Voltage to Frequency Converter LC",
-      price: 162.33,
-      itemQuantity: 5,
-    },
-  ]);
+
+  const [totalPrice, setTotal] = useState(0);
+  const [discount, setDiscount] = useState(50);
+
+  const [data, setData] = useState([]);
+  const { user, loading } = useAuth();
+
   useEffect(() => {
-    setPrice(0);
-    data.forEach((ele) => {
-      if (ele) setPrice((pre) => pre + ele.price * ele.itemQuantity);
-    });
-  });
-  return (
-    <div className="pt-5 w-auto min-h-screen bg-bg-gray flex flex-col justify-between">
-      {/* header */}
-      <div className="py-6 px-5 flex justify-between gap-5">
-        <h2 className="font-bold text-left text-3xl w-fit flex items-center gap-4">
-          <Link to={"/dashboard"}>
-            <ArrowBack />
-          </Link>
-          Cart
-        </h2>
-        <button className="bg-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-opa-green">
-          <Account />
-        </button>
-      </div>
+    let cartKey = localStorage.getItem("myCart");
+    const cartItems = cartKey ? JSON.parse(cartKey) : [];
 
-      {/* main */}
-      <div className="bg-white m-4 rounded-2xl p-4">
-        <header className="flex gap-2 items-center border-b border-border-gray py-6">
-          <div className="circle"></div>
-          <p className="font-medium text-base">A. K. Akram Enterprice</p>
-        </header>
-        <div className="my-2">
-          {data?.map((ele, id) => {
-            return (
-              <EachCart
-                key={`items-${id}`}
-                price={ele?.price}
-                title={ele?.title}
-                number={ele?.itemQuantity}
-                id={id}
-                setItemNumber={setData}
+    if (Array.isArray(cartItems)) {
+      if (cartItems?.length > 0) {
+        setData(cartItems);
+      } else setData([]);
+    } else setData([]);
+  }, []);
+
+  useEffect(() => {
+    if (Array.isArray(data)) {
+      setTotal(0);
+      setTotal(data.reduce((p, c) => p + c?.price * c?.quantity || 0, 0));
+    }
+  }, [data]);
+  if (!loading)
+    return (
+      <div className="pt-5 w-auto min-h-screen bg-bg-gray flex flex-col justify-between">
+        {/* header */}
+        <div className="py-6 px-5 flex justify-between gap-5">
+          <h2 className="font-bold text-left text-3xl w-fit flex items-center gap-4">
+            <Link to={"/dashboard"}>
+              <ArrowBack />
+            </Link>
+            Cart
+          </h2>
+          <button className="bg-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-opa-green">
+            <Account />
+          </button>
+        </div>
+
+        {/* main */}
+        <div className="bg-white m-4 rounded-2xl p-4">
+          <header className="flex gap-2 items-center border-b border-border-gray py-6">
+            <div className="circle"></div>
+            <p className="font-medium text-base break-words">
+              {user?.first_name} {user?.last_name}
+            </p>
+          </header>
+          <div className="my-2">
+            {data?.map((ele, id) => {
+              return (
+                <EachCart
+                  key={`items-${id}`}
+                  number={ele?.quantity}
+                  id={ele?.productId}
+                  title={ele?.title}
+                  price={Number(ele?.price || 0)}
+                  setItemNumber={setData}
+                  setTotal={setTotal}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* footer */}
+
+        {data?.length > 0 ? (
+          <div className="float-end sticky bottom-0 w-full bg-bg-gray">
+            <div className="totalPrice px-10 py-5 text-title/90">
+              <section className="grid grid-cols-3 items-center">
+                <p>Subtotal</p>
+                <DottedLine />
+                <p className="text-right">
+                  ৳ {(totalPrice ? totalPrice : 0)?.toFixed(2)}
+                </p>
+              </section>
+              <section className="grid grid-cols-3 items-center">
+                <p>Discount</p>
+                <DottedLine />
+                <p className="text-right">৳ {discount.toFixed(2)}</p>
+              </section>
+            </div>
+            <div className="bg-white px-5 py-8 flex justify-between items-center  rounded-t-3xl">
+              <section>
+                <p className="font-semibold text-tBlack text-3xl">
+                  ৳{" "}
+                  {totalPrice
+                    ? (Number(totalPrice) - discount).toFixed(2)
+                    : (0).toFixed(2)}
+                </p>
+                <p className="font-normal text-xs">
+                  <sup className="text-default-green">*</sup> without applied
+                  shipping fee
+                </p>
+              </section>
+              <Button
+                classes={"px-6 py-3 text-base font-semibod"}
+                text={"Checkout"}
+                onclick={() => {
+                  navigate("/checkout/ship");
+                }}
               />
-            );
-          })}
-        </div>
-      </div>
-
-      {/* footer */}
-
-      <div className="float-end sticky bottom-0 w-full bg-bg-gray">
-        <div className="totalPrice px-10 py-5 text-title/90">
-          <section className="grid grid-cols-3 items-center">
-            <p>Subtotal</p>
-            <DottedLine />
-            <p className="text-right">৳ {totalPrice.toFixed(2)}</p>
-          </section>
-          <section className="grid grid-cols-3 items-center">
-            <p>Discount</p>
-            <DottedLine />
-            <p className="text-right">৳ 00.00</p>
-          </section>
-        </div>
-        <div className="bg-white px-5 py-8 flex justify-between items-center  rounded-t-3xl">
-          <section>
-            <p className="font-semibold text-tBlack text-3xl">
-              ৳ {totalPrice.toFixed(2).toString()}
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white p-10 rounded-md flex justify-center items-center flex-col mx-10">
+            <h2 className="text-3xl text-default-green font-medium">
+              Your cart is empty.
+            </h2>
+            <p className="text-xl font-light text-center">
+              Go to{" "}
+              <NavLink
+                className={
+                  "text-white bg-default-green rounded-full px-4 capitalize hover:bg-green-700"
+                }
+                to="/dashboard"
+              >
+                product list
+              </NavLink>{" "}
+              page and start shoping!
             </p>
-            <p className="font-normal text-xs">
-              <sup className="text-default-green">*</sup> without applied
-              shipping fee
-            </p>
-          </section>
-          <Button
-            classes={"px-6 py-3 text-base font-semibod"}
-            text={"Checkout"}
-            onclick={() => {
-              navigate("/checkout/ship");
-            }}
-          />
-        </div>
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
 };
 
 export default Cart;

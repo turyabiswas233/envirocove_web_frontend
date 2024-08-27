@@ -30,11 +30,11 @@ const CardSelect = ({ id, select = false, title, text, onClick }) => {
 const Home = () => {
   const navi = useNavigate();
 
-  const [user] = useAuth();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (user) navi("/dashboard");
-  }, [user]);
+    if (!loading) if (user) navi("/dashboard");
+  }, [user, loading]);
 
   const [selectedOption, setSelectedOption] = useState(1);
   const [data, setData] = useState([

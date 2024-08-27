@@ -3,13 +3,25 @@ import { Google } from "./icons/icons";
 import Button from "./Button";
 import { Link, useNavigate } from "react-router-dom";
 import { account } from "../api/index";
+import { useAuth } from "../context/auth";
 function Login() {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [resentOTP, setOTPtimer] = useState(0);
+  const [btnStatus, setbtnStatus] = useState("Login");
   const [userInfo, setInfo] = useState({
     phone: "",
     otp: "",
   });
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        console.warn("user is not logged in");
+        return;
+      }
+      // navigate("/dashboard");
+    }
+  }, [user, loading]);
   useEffect(() => {
     if (resentOTP > 0) {
       const loop = setInterval(() => {
@@ -25,6 +37,7 @@ function Login() {
 
   function handleSubmit(e) {
     e.preventDefault();
+    setbtnStatus("loading...");
     account
       .login({
         username: userInfo.phone || "",
@@ -32,13 +45,14 @@ function Login() {
       })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res?.details);
+        console.warn(res?.detail);
+        if (res?.detail) alert(res?.detail);
+
         if (res.token) {
-          localStorage.removeItem("TOKEN");
-          setTimeout(() => {
-            localStorage.setItem("TOKEN", res.token);
-          }, 2000);
+          localStorage.setItem("TOKEN", `Token ${res.token}`);
+
           alert(`You have logged in as ${res.username}`);
+          setbtnStatus("wait a moment...");
           if (!res.is_active) {
             alert(
               "But your account may be disabled for a while. So you are going to be logged out"
@@ -46,11 +60,17 @@ function Login() {
             localStorage.clear();
             navigate("/");
           }
+          const loop = setTimeout(() => {
+            clearTimeout(loop);
+            setbtnStatus("Login");
+            localStorage.setItem("TOKEN", `Token ${res.token}`);
+            navigate("/dashboard");
+          }, 2000);
         }
       })
       .catch((er) => console.log("er", er));
   }
-
+  if (user) return <div className="p-5 font-bold text-center">User is logged in as {user?.username}</div>;
   return (
     <div className="py-32 px-4  w-auto overflow-y-auto">
       <div className="header grid grid-cols-1 gap-5">
@@ -125,9 +145,13 @@ function Login() {
 
           <Button
             classes={"py-5 my-2 font-medium text-lg"}
-            text={"Login"}
+            text={btnStatus}
             type={"submit"}
-            disabled={userInfo.phone.length <= 3 || userInfo.otp.length < 6}
+            disabled={
+              userInfo.phone.length <= 3 ||
+              userInfo.otp.length < 6 ||
+              btnStatus !== "Login"
+            }
           />
           <p className="text-center">
             Don&apos;t have an account?{" "}

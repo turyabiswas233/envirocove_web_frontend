@@ -8,6 +8,12 @@ const randomID =
   (Math.random() * 10000).toPrecision(4);
 localStorage.setItem("randomID", JSON.stringify(randomID));
 
+const itemsList = JSON.parse(localStorage.getItem("myCart"));
+
+const totalPrice = Array.isArray(itemsList)
+  ? itemsList.reduce((p, c) => p + c?.price * c?.quantity || 0, 0)
+  : 0;
+
 function CheckoutPay() {
   const [sid, setSelect] = useState(-1); // This can be used as the choosen option of payment method.
   /*
@@ -55,7 +61,7 @@ function CheckoutPay() {
           Order #{randomID}
         </p>
         <h2 className="text-3xl font-semibold">
-          <span className="text-default-green">৳</span> 412.05
+          <span className="text-default-green">৳</span> {totalPrice.toFixed(2)}
         </h2>
       </div>
 
@@ -83,7 +89,7 @@ function CheckoutPay() {
         text={"Pay BDT 412.05"}
         onclick={() => {
           alert(`SUCCESSFULLY PAID\nOrder No #${randomID}`);
-          localStorage.clear();
+          localStorage.removeItem("myCart");
           window.location.reload();
         }}
       />
@@ -107,8 +113,15 @@ const Option = ({ icon, name, select = false, toggle }) => {
           !select ? "bg-white" : "bg-black"
         } circle transition-colors`}
       >
-        <div className="w-2 h-1 origin-left translate-y-1.5 translate-x-1 rounded-full bg-white rotate-45"></div>
-        <div className="w-3 h-1 origin-left translate-y-2 translate-x-1.5 rounded-full bg-white -rotate-45"></div>
+        <img
+          className="translate-y-0.5"
+          src={check}
+          alt="check"
+          width={25}
+          height={25}
+        />
+        {/* <div className="w-2 h-1 origin-left translate-y-1.5 translate-x-1 rounded-full bg-white rotate-45"></div>
+        <div className="w-3 h-1 origin-left translate-y-2 translate-x-1.5 rounded-full bg-white -rotate-45"></div> */}
       </div>
     </div>
   );

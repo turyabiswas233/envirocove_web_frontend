@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import bell from "/images/icons/bell.svg";
 function Orders() {
   const [orders, setOrders] = useState([
@@ -51,29 +51,54 @@ function Orders() {
           {orders.length > 0 && (
             <div className="absolute top-1.5 right-2 bg-totamo p-1 rounded-full"></div>
           )}
-          {showNoti && (
-            <div className="absolute top-full -left-52 w-64">
-              {orders.length > 0
-                ? orders.map((od, i) =>
-                    i < 8 ? <Message key={od.id} details={od} /> : null
-                  )
-                : "Notification is empty!"}
-            </div>
-          )}
+
+          <div
+            className="absolute top-full -left-52 w-64"
+            style={{
+              pointerEvents: showNoti ? "auto" : "none",
+            }}
+          >
+            {orders.length > 0
+              ? orders.map((od, i) =>
+                  i < 8 ? (
+                    <Message
+                      key={od.id}
+                      details={od}
+                      id={i}
+                      toggle={showNoti}
+                    />
+                  ) : null
+                )
+              : "Notification is empty!"}
+          </div>
         </div>
       </div>
 
       {/* top-nav-buttons */}
       <div className="grid grid-cols-2 gap-5 font-semibold">
         <button className="bg-transparent text-black py-3 rounded-full focus:bg-default-green focus:text-white">{`Pending (${orders.length})`}</button>
-        <button className="bg-transparent text-black py-3 rounded-full focus:bg-default-green focus:text-white">Completed</button>
+        <button className="bg-transparent text-black py-3 rounded-full focus:bg-default-green focus:text-white">
+          Completed
+        </button>
       </div>
     </div>
   );
 }
-const Message = ({ details }) => {
+const Message = ({ details, id, toggle }) => {
+  const [anime, setanime] = useState(false);
+
+  useEffect(() => {
+    setanime(toggle);
+  }, [toggle]);
   return (
-    <div className="bg-white rounded-xl p-3 grid my-2 hover:bg-horizon transition-colors ease-in-out cursor-default">
+    <div
+      className={`bg-white/30 backdrop-blur-md rounded-xl p-3 grid my-2 hover:bg-horizon/50 ease-in-out cursor-default transition-opacity duration-300 ${
+        anime ? "opacity-100" : "opacity-0"
+      }`}
+      style={{
+        transitionDelay: `${anime ? id * 50 : 50 / (id + 1)}ms`,
+      }}
+    >
       <p className="text-lg text-default-gray font-semibold">{details?.name}</p>
       <p className="text-sm text-default-gray/80 font-normal">
         {details?.text}

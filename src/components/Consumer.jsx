@@ -1,30 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Account, CartIcon } from "./icons/icons";
 import Pic from "../assets/triod.png";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { product, account } from "../api/index";
 function Consumer() {
   const [tab, setTab] = useState(tabs[0]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
-
   useEffect(() => {
     account
       .profile("GET")
-      .then(async (res) => {
-        const data = await res.json();
-        if (data) {
-          if (data.is_active) return;
-          else {
-            navigate("/");
-          }
-        } else {
-          navigate("/");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.detail) console.warn(data?.detail);
+        else console.log(data);
       });
 
     product
@@ -59,11 +49,8 @@ function Consumer() {
           <button
             className="rounded-full bg-rose-400 p-2 justify-center items-center flex"
             onClick={() => {
-              account
-                .logout()
-                // .then((res) => res.json())
-                .then((d) => console.log(d.json()));
-              // .catch((e) => console.warn(e));
+              localStorage.clear();
+              window.location.assign("/");
             }}
           >
             logout
@@ -107,13 +94,15 @@ function Consumer() {
                 condition={item.condition}
                 category={item.category}
                 onClick={() => {
-                  navigate("/product/" + item.id);
+                  console.log(item);
+
+                  navigate("/product/?id=" + item.id);
                 }}
               />
             );
           })
         ) : (
-          <p>{"No products available" + "TOKEN"}</p>
+          <p>{"No products available"}</p>
         )}
       </div>
     </div>
@@ -131,8 +120,6 @@ const ItemCart = ({
   quantity,
   onClick,
 }) => {
-  console.log(category);
-
   return (
     <div
       className="bg-white hover:bg-gray-900/20 transition-colors rounded-[20px] p-2 text-left"

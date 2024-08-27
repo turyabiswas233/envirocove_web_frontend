@@ -45,7 +45,7 @@ const rootRouter = createBrowserRouter([
         element: <Consumer />,
       },
       {
-        path: "/product/:id",
+        path: "/product",
         element: <Product />,
       },
       {

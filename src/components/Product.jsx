@@ -11,29 +11,28 @@ import {
 } from "./icons/icons";
 import Pic from "../assets/triod.png";
 import Button from "./Button";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { product } from "../api/index";
 function Product() {
   const [data, setData] = useState(null);
   const [loading, setloading] = useState(true);
-  const { id } = useParams();
+  const search = useSearchParams();
+  const id = search[0].get("id") || 0;
+  const [num, setNum] = useState(1);
   useEffect(() => {
-    try {
-      product
-        .item(id)
-        .then((res) => res.json())
-        .then((res) => (res.id ? setData(res) : setData(null)))
-        .catch((err) => console.log(err))
-        .finally((e) => setloading(false));
-    } catch (error) {
-      console.log(error);
-    }
-  }, [id]);
+    product
+      .item(id)
+      .then((res) => res.json())
+      .then((data) => setData(data))
+      .catch((err) => console.log(err))
+      .finally(() => setloading(false));
+  }, []);
 
   const Counter = () => {
-    const [num, setNum] = useState(1);
     const increament = () => {
-      if (num < 7) setNum((pre) => pre + 1);
+      if (num < 7)
+        if (data?.quantity - 1 > num) setNum((pre) => pre + 1);
+        else alert("Not more item available in out stock.");
     };
 
     const decreament = () => {
@@ -62,6 +61,7 @@ function Product() {
       </div>
     );
   };
+  let cartNum = JSON.parse(localStorage.getItem("myCart"));
   if (loading) return <div className="p-5 text-lg">Loading...</div>;
   if (data)
     return (
@@ -74,12 +74,7 @@ function Product() {
                 <Back /> Back
               </Link>
             </button>
-            <Link
-              className="rounded-full border  border-border-gray p-2 w-10 h-10 justify-center items-center flex"
-              to={"/mycart"}
-            >
-              <CartIcon />
-            </Link>
+            <CartIcon />
           </div>
           <div className="w-full">
             <img
@@ -102,7 +97,7 @@ function Product() {
               <Efficiency />
               <p className="text-gray-600 text-xs font-medium">Efficienc</p>
               <p className="text-default-gray text-sm font-semibold">
-                {Number(data?.efficiency).toPrecision(5)}%{" "}
+                {Number(data?.efficiency).toFixed(2)}%{" "}
                 <sup className="text-default-green">*</sup>
               </p>
             </section>
@@ -178,9 +173,9 @@ function Product() {
           <section className="top flex justify-between items-center">
             <p className="font-semibold text-tBlack text-3xl">
               <span className="text-default-green">৳</span>{" "}
-              <span>{data?.price - (data?.price % 1)}</span>
+              <span>{data?.price - (data?.price % 1) || "0"}</span>
               <span className="text-default-gray text-2xl">
-                .{(data?.price % 1).toFixed(2).split(".")[1]}
+                .{(data?.price % 1 || 0).toFixed(2).split(".")[1] || "00"}
               </span>
             </p>
             <Counter />
@@ -190,15 +185,46 @@ function Product() {
             classes={"py-3 mt-4 font-medium"}
             text={"Add to cart"}
             icon={<AddCart />}
+            disabled={!data?.quantity}
+            onclick={() => {
+              let myCartKey = localStorage.getItem("myCart");
+              let cartList = myCartKey ? JSON.parse(myCartKey) : [];
+              const findCur = cartList.findIndex(
+                (ele) => ele?.productId === id
+              );
+
+              if (findCur === -1) {
+                cartList.push({
+                  productId: id,
+                  title: data?.title,
+                  quantity: num,
+                  price: data?.price ? Number(data?.price) : 0,
+                });
+                localStorage.setItem("myCart", JSON.stringify(cartList));
+                alert("Item added to your cart");
+              } else {
+                if (cartList[findCur]?.quantity !== num) {
+                  localStorage.setItem(
+                    "myCart",
+                    JSON.stringify([
+                      ...cartList.filter((ele, ei) => ei !== findCur),
+                      {
+                        productId: id,
+                        title: data?.title,
+                        quantity: num,
+                        price: data?.price ? Number(data?.price) : 0,
+                      },
+                    ])
+                  );
+                  alert("Item updated to your cart.");
+                } else alert("Already added the product");
+              }
+            }}
           />
         </div>
       </div>
     );
-  return (
-    <div className="p-5 text-xl text-center pt-20 font-bold">
-      No product id found
-    </div>
-  );
+  return <p>wait a while...</p>;
 }
 export const condition = (type) => {
   switch (type) {

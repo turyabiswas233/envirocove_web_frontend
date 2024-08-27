@@ -10,7 +10,8 @@ import settingFill from "/images/icons/nav/active-icon/setting.svg";
 import Load from "../Load";
 
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { account } from "../../api/index";
+import { useCore } from "../../context/auth";
+
 function AdminPage() {
   const AdminNav = () => {
     const links = [
@@ -81,52 +82,26 @@ function AdminPage() {
     );
   };
   const navi = useNavigate();
-  const [load, setLoad] = useState(true);
+  const { isVendor, loading } = useCore();
   useEffect(() => {
-    try {
-      account.core
-        .isVendor()
-        .then((res) => res.json())
-        .then((d) => {
-          if (d?.type === "vender") {
-            return;
-          }
-          navi("/", {
-            state: {
-              adminError: "You are not a vendor user",
-            },
-          })
-        })
-        .catch((e) => {
-          console.log(e);
-          navi("/dashboard", {
-            state: {
-              adminError: "You are not a vendor user",
-            },
-          });
-        })
-        .finally(() => {
-          setLoad(false);
+    if (!loading) {
+      if (isVendor === false) {
+        navi("/dashboard", {
+          state: {
+            adminError: "You are not a vendor user",
+          },
         });
-    } catch (error) {
-      console.log(error);
-      navi("/dashboard", {
-        state: {
-          adminError: "You are not a vendor user",
-        },
-      });
-    } finally {
-      setLoad(false);
+      }
     }
-  }, []);
-
-  return (
-    <div className="bg-bg-gray w-full h-screen overflow-y-auto">
-      <Outlet />
-      {load && <Load />}
-      <AdminNav />
-    </div>
-  );
+  }, [isVendor, loading]);
+  if (!loading)
+    return (
+      <div className="bg-bg-gray w-full h-screen overflow-y-auto">
+        <Outlet />
+        {loading && <Load />}
+        <AdminNav />
+      </div>
+    );
 }
 
 export default AdminPage;

@@ -23,11 +23,10 @@ function Signup() {
 
   useEffect(() => {
     if (TOKEN) {
-      console.log(TOKEN);
-      console.log(location.state);
-
+      console.warn("TOKEN FOUND");
+      console.log("state", location.state);
       navigate("/dashboard");
-    } else localStorage.removeItem("TOKEN");
+    } else localStorage.clear();
   }, [TOKEN]);
 
   function toggleAgree() {
@@ -66,6 +65,7 @@ function Signup() {
               .finally(() => {
                 navigate("/dashboard");
               });
+          else navigate("/");
         } else {
           alert("Registration failed");
           console.log(data);
@@ -121,8 +121,12 @@ function Signup() {
               name="email"
               onChange={handleInput}
             />
-            {error && error?.username && <p className="text-sm text-rose-500 px-5">{error?.username[0]}</p>}
-            {error && error?.email && <p className="text-sm text-rose-500 px-5">{error?.email[0]}</p>}
+            {error && error?.username && (
+              <p className="text-sm text-rose-500 px-5">{error?.username[0]}</p>
+            )}
+            {error && error?.email && (
+              <p className="text-sm text-rose-500 px-5">{error?.email[0]}</p>
+            )}
           </div>
           <div className="input">
             <label htmlFor="pass">Password</label>
