@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import bell from "/images/icons/bell.svg";
 import received from "/images/icons/received.svg";
 import danger from "/images/icons/danger.svg";
 import { Link } from "react-router-dom";
+import { product } from "../../api/index";
+
 const HeroBox = ({ label, icon, number = 0, bg }) => {
   return (
     <div
@@ -35,54 +38,43 @@ function AdminHome() {
     {
       id: 1,
       name: "Shakib Khan",
-      text: "New message from Shakib",
+      text: "Order from Shakib",
     },
     {
       id: 2,
       name: "Turya Biswas",
-      text: "2 messages from Turya",
+      text: "2 orders from Turya",
     },
     {
       id: 3,
       name: "Shakib Khan",
-      text: "New message from Shakib",
+      text: "Order from Shakib",
     },
     {
       id: 4,
       name: "Turya Biswas",
-      text: "2 messages from Turya",
-    },
-    {
-      id: 5,
-      name: "Shakib Khan",
-      text: "New message from Shakib",
-    },
-    {
-      id: 6,
-      name: "Turya Biswas",
-      text: "2 messages from Turya",
+      text: "2 orders from Turya",
     },
   ]);
   const [showNoti, setShowNoti] = useState(false);
+  const [items, setItems] = useState([]);
+  const { user } = useOutletContext();
 
-  const items = [
-    {
-      id: 120,
-      title: "4 pcs 100 volt 2 amp Bridge rectified- 2W10",
-      image: danger,
-      price: 5173.25,
-      sold: 52,
-      stock: 35,
-    },
-    {
-      id: 1020,
-      title: "3 pcs 1000 volt 5 amp Bridge rectified- 2W100",
-      image: received,
-      price: 10173.25,
-      sold: 22,
-      stock: 57
-    }
-  ];
+  useEffect(() => {
+    product
+      .list()
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setItems(
+            !user
+              ? data?.filter((ele) => ele?.vendor?.username === user?.username)
+              : []
+          );
+        }
+      });
+  }, [user]);
+
   return (
     <div className="p-5 w-auto min-h-screen bg-bg-gray space-y-8 pb-32">
       {/* header */}
@@ -133,19 +125,28 @@ function AdminHome() {
           <option value="active">Active</option>
         </select>
       </div>
-      {items.map((it, id) => {
-        return (
-          <ItemCard
-            key={id}
-            id={id}
-            title={it.title}
-            image={it.image}
-            price={it.price}
-            sold={it.sold}
-            stock={it.stock}
-          />
-        );
-      })}
+      {items?.length > 0 ? (
+        items
+          .sort((a, b) => {
+            if (a?.id < b?.id) return 1;
+            else return -1;
+          })
+          .map((it, id) => {
+            return (
+              <ItemCard
+                key={id}
+                id={it?.id}
+                title={it.title}
+                image={it.image}
+                price={it.price}
+                sold={it.sold}
+                stock={it.stock}
+              />
+            );
+          })
+      ) : (
+        <p className="text-center py-10 font-semibold text-xl">You have no product added</p>
+      )}
     </div>
   );
 }
@@ -161,17 +162,34 @@ const Message = ({ details }) => {
   );
 };
 
-const ItemCard = ({ id, image, title, price, sold, stock }) => {
+const ItemCard = ({ id, title, price, sold, stock }) => {
+  const [images, setImg] = useState([]);
+  //fetch Image
+  useEffect(() => {
+    product
+      .getImage(id)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setImg(data);
+        }
+      });
+  }, [id]);
+
   return (
     <div className="rounded-2xl bg-white p-5 my-2 space-y-3">
-      <div className="flex gap-5 justify-between">
-        <img
-          className="bg-gray-300 rounded-xl aspect-square object-cover p-2"
-          src={image}
-          width={100}
-          height={100}
-        />
-        <div className="space-y-2">
+      <div className="flex gap-5 justify-between flex-wrap">
+        {images?.length > 0 ? (
+          <img
+            className="bg-gray-300 rounded-xl aspect-square object-cover p-2"
+            src={images[0]?.image}
+            width={100}
+            height={100}
+          />
+        ) : (
+          ""
+        )}
+        <div className="space-y-2 flex-grow">
           <p>{title}</p>
           <button className="font-medium text-base rounded-full bg-tBlack text-white py-2 px-5">
             Edit

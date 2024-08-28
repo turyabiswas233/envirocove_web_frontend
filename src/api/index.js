@@ -112,6 +112,36 @@ export const product = {
       },
     });
   },
+
+  getImage: async function (pid) {
+    return fetch(`${config.api_url}/${ROUTES.PRODUCT_IMG}/?product_id=${pid}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+    });
+  },
+  //upload
+  addImage: async function (fdata) {
+    return fetch(`${config.api_url}/${ROUTES.PRODUCT_IMG}/`, {
+      method: "POST",
+      headers: {
+        Authorization: token,
+      },
+      body: fdata,
+    });
+  },
+  post: async function (jsonData) {
+    return fetch(`${config.api_url}/${ROUTES.PRODUCT}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+      body: JSON.stringify(jsonData),
+    });
+  },
 };
 
 const ROUTES = {
@@ -131,4 +161,5 @@ const ROUTES = {
 
   //product
   PRODUCT: `product/list`,
+  PRODUCT_IMG: `product/images`,
 };

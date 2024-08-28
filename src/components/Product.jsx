@@ -19,6 +19,7 @@ function Product() {
   const search = useSearchParams();
   const id = search[0].get("id") || 0;
   const [num, setNum] = useState(1);
+  const [image, setImage] = useState("");
   useEffect(() => {
     product
       .item(id)
@@ -27,6 +28,21 @@ function Product() {
       .catch((err) => console.log(err))
       .finally(() => setloading(false));
   }, []);
+
+  useEffect(() => {
+    product
+      .getImage(id)
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+
+        if (Array.isArray(res))
+          if (res.length > 0) setImage(res[0].image);
+          else setImage(Pic);
+        else setImage(Pic);
+        console.log(res[0]);
+      });
+  }, [id]);
 
   const Counter = () => {
     const increament = () => {
@@ -61,7 +77,7 @@ function Product() {
       </div>
     );
   };
-  let cartNum = JSON.parse(localStorage.getItem("myCart"));
+
   if (loading) return <div className="p-5 text-lg">Loading...</div>;
   if (data)
     return (
@@ -79,7 +95,7 @@ function Product() {
           <div className="w-full">
             <img
               className="mx-auto mb-10"
-              src={Pic}
+              src={image}
               width={450}
               height={450}
               alt="Image.png"
@@ -115,12 +131,11 @@ function Product() {
           <p className="font-medium pt-2">
             {data?.title}
             <br />
-            Product ID:{id}
+            {/* Product ID:{id} */}
           </p>
           {/* vendor details */}
           <div className="border-b border-x-default-black py-6">
             <p className="font-semibold">Vendor</p>
-            *vendor er profile fetch krte hbe
             <section className="flex justify-between items-center">
               {/* <img src="" alt="" /> */}
               <div className="p-3 bg-bg-gray rounded-full">
@@ -129,7 +144,10 @@ function Product() {
               </div>
               {/* vendor details */}
               <div>
-                <p className="font-semibold text-tBlack">Vendor name</p>
+                <p className="font-semibold text-tBlack">
+                  {data?.vendor?.first_name || "No"}{" "}
+                  {data?.vendor?.last_name || "name"}
+                </p>
                 <p className="flex items-center gap-2">
                   <Star />
                   <span>{"4.6 (Rated by 26 users)"}</span>

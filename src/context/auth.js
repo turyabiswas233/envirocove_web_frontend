@@ -10,7 +10,6 @@ const useAuth = () => {
       .then((data) => {
         if (data?.username) {
           setUser(data);
-          console.log(data);
         } else setUser(null);
       })
       .catch((err) => {

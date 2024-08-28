@@ -43,14 +43,22 @@ function CheckoutShip() {
             <button
               className="text-default-green"
               onClick={() => {
-                setChange(true);
-                account
-                  .setAddress(address)
-                  .then((res) => res.json())
-                  .then((d) => d?.message === "success" && setChange(false))
-                  .catch((err) => {
-                    alert("failed to change name or address");
-                  });
+                setChange((pre) => !pre);
+
+                if (willChange) {
+                  let askMe = window.confirm(
+                    "Are you sure to change your address?"
+                  );
+                  if (askMe === true)
+                    account
+                      .setAddress(address)
+                      .then((res) => res.json())
+                      .then((d) => d?.message === "success")
+                      .catch((err) => {
+                        alert("failed to change name or address");
+                      });
+                  else setAddress(add);
+                }
               }}
             >
               {willChange == true ? "Update" : "Change"}

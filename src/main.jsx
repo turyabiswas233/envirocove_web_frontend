@@ -27,7 +27,7 @@ const rootRouter = createBrowserRouter([
     path: "/",
     element: <App /> ,
     errorElement: (
-      <div className="p-10 mx-auto bg-black text-white h-screen w-full flex justify-center items-center flex-col gap-4 text-center">
+      <div className="px-10 mx-auto bg-black text-white h-screen w-full flex justify-center items-center flex-col gap-4 text-center">
         <p className="text-3xl">404 Not Found</p>
         <hr className="border border-white w-2/3" />
         <p className="text-lg text-gray-400/50">

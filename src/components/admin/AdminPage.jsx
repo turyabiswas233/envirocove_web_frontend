@@ -10,7 +10,7 @@ import settingFill from "/images/icons/nav/active-icon/setting.svg";
 import Load from "../Load";
 
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useCore } from "../../context/auth";
+import { useAuth, useCore } from "../../context/auth";
 
 function AdminPage() {
   const AdminNav = () => {
@@ -38,8 +38,16 @@ function AdminPage() {
     ];
     const loc = useLocation();
     const willHide = loc.pathname.includes("addproduct");
-
     const [activeId, setActiveID] = useState(-1);
+
+    useEffect(() => {
+      if (loc.pathname === "/admin") {
+        window.location.assign("/admin/products");
+      } else if (loc.pathname === "/admin/") {
+        window.location.assign("/admin/products");
+      }
+    }, [loc]);
+
     if (willHide) return;
     return (
       <div className="fixed bottom-0 left-0 w-screen rounded-t-3xl px-4 bg-white shadow-slate-800 shadow-xl">
@@ -83,6 +91,7 @@ function AdminPage() {
   };
   const navi = useNavigate();
   const { isVendor, loading } = useCore();
+  const { user } = useAuth();
   useEffect(() => {
     if (!loading) {
       if (isVendor === false) {
@@ -91,13 +100,13 @@ function AdminPage() {
             adminError: "You are not a vendor user",
           },
         });
-      }
+      } else console.log("ami vendor");
     }
   }, [isVendor, loading]);
   if (!loading)
     return (
       <div className="bg-bg-gray w-full h-screen overflow-y-auto">
-        <Outlet />
+        <Outlet context={{ user: user }} />
         {loading && <Load />}
         <AdminNav />
       </div>

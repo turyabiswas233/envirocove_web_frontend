@@ -4,7 +4,7 @@ import Pic from "../assets/triod.png";
 import { useNavigate } from "react-router-dom";
 import { product, account } from "../api/index";
 function Consumer() {
-  const [tab, setTab] = useState(tabs[0]);
+  const [tab, setTab] = useState(0);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
@@ -64,13 +64,13 @@ function Consumer() {
             return (
               <li
                 key={`id-${tId}`}
-                className={`relative w-fit text-nowrap px-1 mx-2 transition-colors duration-200 text-base ${
-                  t === tab ? "text-default-green" : "text-place"
+                className={`relative w-fit text-nowrap px-1 mx-2 transition-colors duration-200 text-base hover:text-green-500 cursor-pointer select-none ${
+                  t.id === tab ? "text-default-green" : "text-place"
                 }`}
-                onClick={() => setTab(t)}
+                onClick={() => setTab(t.id)}
               >
-                {t}
-                {t === tab && (
+                {t.title}
+                {tab === t.id && (
                   <span className="absolute rounded-full bg-default-green text-default-green w-1 h-1 p-1 -bottom-2 left-1/2 -translate-x-1/2"></span>
                 )}
               </li>
@@ -79,47 +79,50 @@ function Consumer() {
         </ul>
       </div>
 
-      <div
-        className={`${tab === tabs[0] ? "grid grid-cols-2 gap-5" : "hidden"}`}
-      >
-        {items.length > 0 ? (
-          items.map((item, itemId) => {
-            return (
-              <ItemCart
-                key={`item-id${itemId}`}
-                image={Pic}
-                price={item.price}
-                title={item.title}
-                quantity={item.quantity}
-                condition={item.condition}
-                category={item.category}
-                onClick={() => {
-                  console.log(item);
-
-                  navigate("/product/?id=" + item.id);
-                }}
-              />
-            );
-          })
+      <div className="grid grid-cols-2 gap-5">
+        {items.filter((ele) =>
+          tab === 0 ? ele : ele.category == tab ? ele : null
+        ).length > 0 ? (
+          items
+            .filter((ele) =>
+              tab === 0 ? ele : ele.category == tab ? ele : null
+            )
+            .map((item, itemId) => {
+              return (
+                <ItemCart
+                  key={`item-id${itemId}`}
+                  id={item.id}
+                  price={item.price}
+                  title={item.title}
+                  quantity={item.quantity}
+                  category={item.category}
+                  onClick={() => {
+                    navigate("/product/?id=" + item.id);
+                  }}
+                />
+              );
+            })
         ) : (
-          <p>{"No products available"}</p>
+          <p className="text-center py-7">{"No products available"}</p>
         )}
       </div>
     </div>
   );
 }
-const ItemCart = ({
-  image,
-  title,
-  price,
-  imgAlt,
-  weight,
-  description,
-  condition,
-  category,
-  quantity,
-  onClick,
-}) => {
+const ItemCart = ({ id, title, price, imgAlt, quantity, onClick }) => {
+  const [image, setImage] = useState("");
+  useEffect(() => {
+    product
+      .getImage(id)
+      .then((res) => res.json())
+      .then((res) => {
+        if (Array.isArray(res))
+          if (res.length > 0) setImage(res[0].image);
+          else setImage(Pic);
+        else setImage(Pic);
+      });
+  }, [id]);
+
   return (
     <div
       className="bg-white hover:bg-gray-900/20 transition-colors rounded-[20px] p-2 text-left"
@@ -144,5 +147,10 @@ const ItemCart = ({
     </div>
   );
 };
-const tabs = ["All Products", "Transistors", "Sensors", "Architectures"];
+const tabs = [
+  { title: "All Products", id: 0 },
+  { title: "Transistors", id: 1 },
+  { title: "Sensors", id: 3 },
+  { title: "Architectures", id: 4 },
+];
 export default Consumer;

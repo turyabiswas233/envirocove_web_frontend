@@ -1,22 +1,29 @@
 import React, { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { ArrowBack } from "../icons/icons";
 import { Link } from "react-router-dom";
 import doc from "/images/icons/doc.svg";
 import cross from "/images/icons/cross.svg";
+import { product } from "../../api/index";
+
 function AddProduct() {
+  const [title, settitle] = useState("");
+  const [description, setdescription] = useState("");
   const [images, setImages] = useState([]);
   const [price, setprice] = useState("");
   const [weight, setweight] = useState("");
   const [efficiency, setefficiency] = useState("");
-  const [quantity, setquantity] = useState("");
+  const [quantity, setquantity] = useState(1);
+  const [category, setCategory] = useState(1);
+  const { user } = useOutletContext();
   const opt = [
     {
       title: "Brand new",
-      type: "bnew",
+      type: "new",
     },
     {
       title: "Pre-owned",
-      type: "pre-owned",
+      type: "owned",
     },
     {
       title: "Recycled",
@@ -30,13 +37,18 @@ function AddProduct() {
   };
 
   const addImage = (e) => {
-    if (e != null || e != undefined) setImages((pre) => [...pre, e]);
+    if (e != null || e != undefined)
+      if (images.findIndex((o) => o === e) === -1)
+        setImages((pre) => [...pre, e]);
   };
 
   const ImgCard = ({ ele }) => {
     const image = URL.createObjectURL(ele);
     return (
-      <div className="mt-5 relative">
+      <div
+        className="mt-5 relative "
+        title={`${(ele?.size / 1024 / 1024).toFixed(2)} MB`}
+      >
         <img
           className="aspect-square object-cover rounded-2xl"
           src={image}
@@ -55,10 +67,68 @@ function AddProduct() {
       </div>
     );
   };
+  // form to add product
   return (
     <form
       className="p-5 w-auto min-h-screen bg-white space-y-8 pb-32"
-      onSubmit={(e) => e.preventDefault()}
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (
+          images.length > 0 &&
+          title?.length > 0 &&
+          price !== 0 &&
+          weight &&
+          quantity > 0 &&
+          efficiency.length > 0
+        ) {
+          try {
+            product
+              .post({
+                title: title,
+                price: price,
+                weight: weight,
+                description: description,
+                condition: idType.type,
+                efficiency: efficiency,
+                quantity: quantity,
+                category: category,
+                vendor: user?.id,
+              })
+              .then((res) => res.json())
+              .then((res) => {
+                console.log(res);
+                if (res.id > 0) {
+                  const fdata = new FormData();
+
+                  fdata.append("image", images[0]);
+                  fdata.append("product", res.id);
+
+                  product
+                    .addImage(fdata)
+                    .then((final) => final.json())
+                    .then((final) => {
+                      if (final?.id > 0) {
+                        alert("New Product has been added");
+                        window.location.assign("/admin");
+                      } else alert("Failed to add image");
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                      throw new Error("Failed to upload image");
+                    });
+                }
+              })
+              .catch((err) => {
+                alert("failed to add product");
+                console.warn(err);
+              });
+          } catch (error) {
+            console.log(error);
+          }
+        } else if (images.length === 0) {
+          alert("Please select at least one image");
+        } else alert("Please fill up all the info");
+      }}
     >
       {/* header */}
       <div className="pt-6 flex justify-between gap-5">
@@ -115,6 +185,8 @@ function AddProduct() {
           placeholder="Name your product"
           id="ptitle"
           autoComplete="off"
+          value={title}
+          onChange={(e) => settitle(e.target.value)}
         />
       </section>
       {/* price & weight of product */}
@@ -181,6 +253,8 @@ function AddProduct() {
             placeholder="Name your product"
             id="desc"
             autoComplete="off"
+            onChange={(e) => setdescription(e.target.value)}
+            value={description}
             rows={8}
           />
         </div>
@@ -221,10 +295,16 @@ function AddProduct() {
       {/* Category */}
       <div>
         <p className="font-medium text-title px-2">Category</p>
-        <select className="p-4 rounded-2xl bg-bg-gray w-full">
-          <option value="Light Emitting Diode (LED)">
-            {"Light Emitting Diode (LED)"}
+        <select
+          className="p-4 rounded-2xl bg-bg-gray w-full"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="1" selected>
+            Transistors
           </option>
+          <option value="3">Sensors</option>
+          <option value="4">Architectures</option>
         </select>
       </div>
 
@@ -248,13 +328,13 @@ function AddProduct() {
           <p className="font-medium text-sm px-2">Available Quantity</p>
           <input
             className="text-lg text-gray-500 bg-bg-gray rounded-2xl border-none outline-none px-6 py-4"
-            type="text"
+            type="number"
             name="quantity"
             id="quantity"
             placeholder="01"
             value={quantity}
-            onChange={(e) => setquantity(e.target.value.padStart(1,0))}
-            min={0}
+            onChange={(e) => setquantity(e.target.value)}
+            min={1}
           />
         </section>
       </div>
@@ -264,6 +344,7 @@ function AddProduct() {
         <button
           className="bg-tBlack hover:bg-black transition-colors ease-out text-white font-medium py-4 rounded-full"
           type="button"
+          onClick={() => alert("Currently not available.")}
         >
           Save as draft
         </button>

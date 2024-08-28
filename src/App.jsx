@@ -1,8 +1,9 @@
 import { Outlet, useLocation } from "react-router-dom";
 import "./App.css";
 const TOKEN = localStorage.getItem("TOKEN");
+ 
 function App() {
-  const loc = useLocation();
+  const loc = useLocation(); 
   if (loc.state?.adminError == "You are not a vendor user") {
     alert(loc.state?.adminError);
     window.history.replaceState({}, "");
