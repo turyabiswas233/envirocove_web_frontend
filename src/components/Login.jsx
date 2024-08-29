@@ -68,9 +68,17 @@ function Login() {
           }, 2000);
         }
       })
-      .catch((er) => console.log("er", er));
+      .catch((er) => console.log("er", er))
+      .finally(() => {
+        setbtnStatus("Login");
+      });
   }
-  if (user) return <div className="p-5 font-bold text-center">User is logged in as {user?.username}</div>;
+  if (user)
+    return (
+      <div className="p-5 font-bold text-center">
+        User is logged in as {user?.username}
+      </div>
+    );
   return (
     <div className="py-32 px-4  w-auto overflow-y-auto">
       <div className="header grid grid-cols-1 gap-5">

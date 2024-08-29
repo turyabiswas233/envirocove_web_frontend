@@ -3,11 +3,14 @@ import { Account, CartIcon } from "./icons/icons";
 import Pic from "../assets/triod.png";
 import { useNavigate } from "react-router-dom";
 import { product, account } from "../api/index";
+import { useCategory } from "../context/product";
 function Consumer() {
   const [tab, setTab] = useState(0);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
+  const { category : tabs } = useCategory();
+
   useEffect(() => {
     account
       .profile("GET")
@@ -60,6 +63,17 @@ function Consumer() {
       {/* tab */}
       <div>
         <ul className="flex gap-2 w-full overflow-x-auto items-center py-5">
+          <li
+            className={`relative w-fit text-nowrap px-1 mx-2 transition-colors duration-200 text-base hover:text-green-500 cursor-pointer select-none ${
+              tab === 0 ? "text-default-green" : "text-place"
+            }`}
+            onClick={() => setTab(0)}
+          >
+            All Products
+            {tab === 0 && (
+              <span className="absolute rounded-full bg-default-green text-default-green w-1 h-1 p-1 -bottom-2 left-1/2 -translate-x-1/2"></span>
+            )}
+          </li>
           {tabs.map((t, tId) => {
             return (
               <li
@@ -69,7 +83,7 @@ function Consumer() {
                 }`}
                 onClick={() => setTab(t.id)}
               >
-                {t.title}
+                {t.name}
                 {tab === t.id && (
                   <span className="absolute rounded-full bg-default-green text-default-green w-1 h-1 p-1 -bottom-2 left-1/2 -translate-x-1/2"></span>
                 )}
@@ -78,7 +92,7 @@ function Consumer() {
           })}
         </ul>
       </div>
-
+      {/* products list */}
       <div className="grid grid-cols-2 gap-5">
         {items.filter((ele) =>
           tab === 0 ? ele : ele.category == tab ? ele : null
@@ -147,10 +161,5 @@ const ItemCart = ({ id, title, price, imgAlt, quantity, onClick }) => {
     </div>
   );
 };
-const tabs = [
-  { title: "All Products", id: 0 },
-  { title: "Transistors", id: 1 },
-  { title: "Sensors", id: 3 },
-  { title: "Architectures", id: 4 },
-];
+
 export default Consumer;

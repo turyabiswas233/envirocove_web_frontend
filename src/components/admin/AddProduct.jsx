@@ -5,8 +5,10 @@ import { Link } from "react-router-dom";
 import doc from "/images/icons/doc.svg";
 import cross from "/images/icons/cross.svg";
 import { product } from "../../api/index";
+import { useCategory } from "../../context/product";
 
 function AddProduct() {
+  const { category: tabs } = useCategory();
   const [title, settitle] = useState("");
   const [description, setdescription] = useState("");
   const [images, setImages] = useState([]);
@@ -70,7 +72,7 @@ function AddProduct() {
   // form to add product
   return (
     <form
-      className="p-5 w-auto min-h-screen bg-white space-y-8 pb-32"
+      className="px-5 pt-5 w-auto min-h-screen bg-white space-y-8"
       onSubmit={(e) => {
         e.preventDefault();
         if (
@@ -98,28 +100,36 @@ function AddProduct() {
               .then((res) => {
                 console.log(res);
                 if (res.id > 0) {
-                  const fdata = new FormData();
+                  const promises = images.map((image, iid) => {
+                    const fdata = new FormData();
+                    fdata.append("image", image);
+                    fdata.append("product", res.id);
+                    product
+                      .addImage(fdata)
+                      .then((final) => final.json())
+                      .then((final) => {
+                        if (final) return;
+                        else alert("Failed to upload image" + (iid + 1));
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                        alert("Failed to upload image" + (iid + 1));
+                        throw new Error("Failed to upload all images");
+                      });
+                  });
 
-                  fdata.append("image", images[0]);
-                  fdata.append("product", res.id);
-
-                  product
-                    .addImage(fdata)
-                    .then((final) => final.json())
-                    .then((final) => {
-                      if (final?.id > 0) {
-                        alert("New Product has been added");
-                        window.location.assign("/admin");
-                      } else alert("Failed to add image");
+                  Promise.all(promises)
+                    .then((res) => {
+                      alert("Product has been added");
+                      window.location.assign("/admin");
                     })
                     .catch((err) => {
-                      console.log(err);
-                      throw new Error("Failed to upload image");
+                      alert("Failed to add product");
                     });
                 }
               })
               .catch((err) => {
-                alert("failed to add product");
+                alert("Failed to add product");
                 console.warn(err);
               });
           } catch (error) {
@@ -300,11 +310,11 @@ function AddProduct() {
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
-          <option value="1" selected>
-            Transistors
-          </option>
-          <option value="3">Sensors</option>
-          <option value="4">Architectures</option>
+          {tabs?.map((cat) => (
+            <option key={cat?.id} value={cat?.id}>
+              {cat?.name}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -340,7 +350,7 @@ function AddProduct() {
       </div>
 
       {/* product query saving button */}
-      <div className="fixed bottom-0 left-0 w-screen p-4 rounded-t-2xl bg-opa-green grid grid-cols-2 justify-center gap-5 ">
+      <div className="sticky bottom-0 left-0 w-full p-4 rounded-t-2xl bg-opa-green grid grid-cols-2 justify-center gap-5 ">
         <button
           className="bg-tBlack hover:bg-black transition-colors ease-out text-white font-medium py-4 rounded-full"
           type="button"

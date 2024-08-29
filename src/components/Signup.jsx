@@ -65,7 +65,7 @@ function Signup() {
               .finally(() => {
                 navigate("/dashboard");
               });
-          else navigate("/");
+          else navigate("/dashboard");
         } else {
           alert("Registration failed");
           console.log(data);

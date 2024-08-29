@@ -67,7 +67,7 @@ function AdminHome() {
       .then((data) => {
         if (Array.isArray(data)) {
           setItems(
-            !user
+            user
               ? data?.filter((ele) => ele?.vendor?.username === user?.username)
               : []
           );
@@ -139,13 +139,15 @@ function AdminHome() {
                 title={it.title}
                 image={it.image}
                 price={it.price}
-                sold={it.sold}
-                stock={it.stock}
+                sold={it.sold || 0}
+                stock={it.quantity}
               />
             );
           })
       ) : (
-        <p className="text-center py-10 font-semibold text-xl">You have no product added</p>
+        <p className="text-center py-10 font-semibold text-xl">
+          You have no product added
+        </p>
       )}
     </div>
   );
@@ -217,3 +219,6 @@ const ItemCard = ({ id, title, price, sold, stock }) => {
   );
 };
 export default AdminHome;
+
+
+// not available right now...

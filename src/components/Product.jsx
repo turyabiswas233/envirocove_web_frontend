@@ -11,7 +11,7 @@ import {
 } from "./icons/icons";
 import Pic from "../assets/triod.png";
 import Button from "./Button";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { product } from "../api/index";
 function Product() {
   const [data, setData] = useState(null);
@@ -19,7 +19,8 @@ function Product() {
   const search = useSearchParams();
   const id = search[0].get("id") || 0;
   const [num, setNum] = useState(1);
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState([]);
+  const [imgId, setImgId] = useState(0);
   useEffect(() => {
     product
       .item(id)
@@ -34,20 +35,18 @@ function Product() {
       .getImage(id)
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
-
         if (Array.isArray(res))
-          if (res.length > 0) setImage(res[0].image);
-          else setImage(Pic);
-        else setImage(Pic);
-        console.log(res[0]);
+          if (res.length > 0) setImage(res);
+          else setImage([]);
+        else setImage([]);
+        console.log(res);
       });
   }, [id]);
 
   const Counter = () => {
     const increament = () => {
       if (num < 7)
-        if (data?.quantity - 1 > num) setNum((pre) => pre + 1);
+        if (data?.quantity > num) setNum((pre) => pre + 1);
         else alert("Not more item available in out stock.");
     };
 
@@ -94,12 +93,24 @@ function Product() {
           </div>
           <div className="w-full">
             <img
-              className="mx-auto mb-10"
-              src={image}
+              className="mx-auto my-5 rounded-xl"
+              src={image[imgId] ? image[imgId]?.image : Pic}
               width={450}
               height={450}
               alt="Image.png"
             />
+            <div className="grid grid-cols-5 gap-2 my-5">
+              {image?.map((ig, igid) => (
+                <img
+                  className="aspect-square"
+                  src={ig?.image}
+                  key={`imageKey_${ig?.id}`}
+                  width={70}
+                  height={70}
+                  onClick={() => setImgId(igid)}
+                />
+              ))}
+            </div>
           </div>
           <div className="three-obj rounded-2xl w-full grid grid-cols-3 gap-2 text-left">
             <section className="bg-white p-2 rounded-xl">
@@ -120,7 +131,7 @@ function Product() {
             <section className="bg-white p-2 rounded-xl">
               <Bag />
               <p className="text-gray-600 text-xs font-medium">Availability</p>
-              <p className="text-default-gray text-sm font-semibold">
+              <p className={`text-default-gray text-sm font-semibold ${data?.quantity < 10 && 'text-red-500'}`}>
                 {data?.quantity} {`pc${data?.quantity > 1 ? "s" : ""}`}
               </p>
             </section>

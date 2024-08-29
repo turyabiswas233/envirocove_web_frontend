@@ -3,7 +3,6 @@ import { Account, ArrowBack, DottedLine } from "./icons/icons";
 import Pic from "../assets/triod.png";
 import Button from "./Button";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { product } from "../api/index";
 import { useAuth } from "../context/auth";
 
 const Counter = ({ number, id, setItemNumber }) => {
@@ -61,7 +60,16 @@ const Counter = ({ number, id, setItemNumber }) => {
     </div>
   );
 };
-const EachCart = ({ id, number, price, title, setItemNumber, setTotal }) => {
+const EachCart = ({
+  id,
+  number,
+  price,
+  title,
+  setItemNumber,
+  setTotal,
+  arr,
+  setArr,
+}) => {
   useEffect(() => {
     setTotal(0);
     setTotal((pre) => pre + price);
@@ -73,7 +81,17 @@ const EachCart = ({ id, number, price, title, setItemNumber, setTotal }) => {
         display: number == 0 ? "none" : "flex",
       }}
     >
-      <div className="circle"></div>
+      <div
+        className={`circle transition-colors ${
+          arr.find((p) => p === id) && "bg-default-green/70"
+        }`}
+        onClick={() => {
+          setArr((pre) => {
+            if (pre.find((p) => p === id)) return pre.filter((p) => p !== id);
+            return [...pre, id];
+          });
+        }}
+      ></div>
       <div className="info flex gap-3 w-full justify-start ">
         <img src={Pic} width={100} height={100} alt="" className="rounded-xl" />
         <div className="w-full grid grid-cols-1 justify-between gap-3">
@@ -95,7 +113,7 @@ const Cart = () => {
   const navigate = useNavigate();
 
   const [totalPrice, setTotal] = useState(0);
-  const [discount, setDiscount] = useState(50);
+  const [discount, setDiscount] = useState(0);
 
   const [data, setData] = useState([]);
   const { user, loading } = useAuth();
@@ -114,12 +132,16 @@ const Cart = () => {
   useEffect(() => {
     if (Array.isArray(data)) {
       setTotal(0);
-      setTotal(data.reduce((p, c) => p + c?.price * c?.quantity || 0, 0));
+      setTotal(
+        data.reduce((p, c) => p + (c?.price * c?.quantity) || 0, 0)
+      );
     }
   }, [data]);
+  const [arr, setArr] = useState([]);
+
   if (!loading)
     return (
-      <div className="pt-5 w-auto min-h-screen bg-bg-gray flex flex-col justify-between">
+      <div className="pt-5 w-auto h-screen overflow-y-auto bg-bg-gray">
         {/* header */}
         <div className="py-6 px-5 flex justify-between gap-5">
           <h2 className="font-bold text-left text-3xl w-fit flex items-center gap-4">
@@ -128,95 +150,113 @@ const Cart = () => {
             </Link>
             Cart
           </h2>
-          <button className="bg-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-opa-green">
+          <button
+            className="bg-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-opa-green"
+            onClick={() => alert("Not available")}
+          >
             <Account />
           </button>
         </div>
 
         {/* main */}
-        <div className="bg-white m-4 rounded-2xl p-4">
-          <header className="flex gap-2 items-center border-b border-border-gray py-6">
-            <div className="circle"></div>
-            <p className="font-medium text-base break-words">
-              {user?.first_name} {user?.last_name}
-            </p>
-          </header>
-          <div className="my-2">
-            {data?.map((ele, id) => {
-              return (
-                <EachCart
-                  key={`items-${id}`}
-                  number={ele?.quantity}
-                  id={ele?.productId}
-                  title={ele?.title}
-                  price={Number(ele?.price || 0)}
-                  setItemNumber={setData}
-                  setTotal={setTotal}
-                />
-              );
-            })}
-          </div>
-        </div>
-
-        {/* footer */}
-
-        {data?.length > 0 ? (
-          <div className="float-end sticky bottom-0 w-full bg-bg-gray">
-            <div className="totalPrice px-10 py-5 text-title/90">
-              <section className="grid grid-cols-3 items-center">
-                <p>Subtotal</p>
-                <DottedLine />
-                <p className="text-right">
-                  ৳ {(totalPrice ? totalPrice : 0)?.toFixed(2)}
-                </p>
-              </section>
-              <section className="grid grid-cols-3 items-center">
-                <p>Discount</p>
-                <DottedLine />
-                <p className="text-right">৳ {discount.toFixed(2)}</p>
-              </section>
-            </div>
-            <div className="bg-white px-5 py-8 flex justify-between items-center  rounded-t-3xl">
-              <section>
-                <p className="font-semibold text-tBlack text-3xl">
-                  ৳{" "}
-                  {totalPrice
-                    ? (Number(totalPrice) - discount).toFixed(2)
-                    : (0).toFixed(2)}
-                </p>
-                <p className="font-normal text-xs">
-                  <sup className="text-default-green">*</sup> without applied
-                  shipping fee
-                </p>
-              </section>
-              <Button
-                classes={"px-6 py-3 text-base font-semibod"}
-                text={"Checkout"}
-                onclick={() => {
-                  navigate("/checkout/ship");
+        <div className="h-full flex justify-between flex-col">
+          <div className="bg-white rounded-2xl p-4 m-4">
+            <header className="flex gap-2 items-center border-b border-border-gray py-6">
+              <div
+                className={`circle transition-colors ${
+                  data.length === arr.length && "bg-default-green/70"
+                }`}
+                onClick={() => {
+                  if (arr.length != data.length)
+                    setArr(
+                      data?.map((ele) => {
+                        return ele?.productId;
+                      })
+                    );
+                  else setArr([]);
                 }}
-              />
+              ></div>
+              <p className="font-medium text-base break-words">
+                {user?.first_name || "No"} {user?.last_name || "Name"}
+              </p>
+            </header>
+            <div className="my-2">
+              {data?.map((ele, id) => {
+                return (
+                  <EachCart
+                    key={`items-${id}`}
+                    number={ele?.quantity}
+                    id={ele?.productId}
+                    title={ele?.title}
+                    price={Number(ele?.price || 0)}
+                    setItemNumber={setData}
+                    setTotal={setTotal}
+                    arr={arr}
+                    setArr={setArr}
+                  />
+                );
+              })}
             </div>
+            {/* footer */}
           </div>
-        ) : (
-          <div className="bg-white p-10 rounded-md flex justify-center items-center flex-col mx-10">
-            <h2 className="text-3xl text-default-green font-medium">
-              Your cart is empty.
-            </h2>
-            <p className="text-xl font-light text-center">
-              Go to{" "}
-              <NavLink
-                className={
-                  "text-white bg-default-green rounded-full px-4 capitalize hover:bg-green-700"
-                }
-                to="/dashboard"
-              >
-                product list
-              </NavLink>{" "}
-              page and start shoping!
-            </p>
-          </div>
-        )}
+          {data?.length > 0 ? (
+            <div className="float-end sticky bottom-0 w-full bg-bg-gray">
+              <div className="totalPrice px-10 py-5 text-title/90">
+                <section className="grid grid-cols-3 items-center">
+                  <p>Subtotal</p>
+                  <DottedLine />
+                  <p className="text-right">
+                    ৳ {(totalPrice ? totalPrice : 0)?.toFixed(2)}
+                  </p>
+                </section>
+                <section className="grid grid-cols-3 items-center">
+                  <p>Discount</p>
+                  <DottedLine />
+                  <p className="text-right">৳ {discount.toFixed(2)}</p>
+                </section>
+              </div>
+              <div className="bg-white px-5 py-8 flex justify-between items-center  rounded-t-3xl">
+                <section>
+                  <p className="font-semibold text-tBlack text-3xl">
+                    ৳{" "}
+                    {totalPrice
+                      ? (Number(totalPrice) - discount).toFixed(2)
+                      : (0).toFixed(2)}
+                  </p>
+                  <p className="font-normal text-xs">
+                    <sup className="text-default-green">*</sup> without applied
+                    shipping fee
+                  </p>
+                </section>
+                <Button
+                  classes={"px-6 py-3 text-base font-semibod"}
+                  text={"Checkout"}
+                  onclick={() => {
+                    navigate("/checkout/ship");
+                  }}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white p-10 rounded-md flex justify-center items-center flex-col mx-10">
+              <h2 className="text-3xl text-default-green font-medium">
+                Your cart is empty.
+              </h2>
+              <p className="text-xl font-light text-center">
+                Go to{" "}
+                <NavLink
+                  className={
+                    "text-white bg-default-green rounded-full px-4 capitalize hover:bg-green-700"
+                  }
+                  to="/dashboard"
+                >
+                  product list
+                </NavLink>{" "}
+                page and start shoping!
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     );
 };

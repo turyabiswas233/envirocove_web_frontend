@@ -92,6 +92,14 @@ export const account = {
 };
 
 export const product = {
+  category: async function () {
+    return fetch(`${config.api_url}/product/categories/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
   list: async function () {
     return fetch(`${config.api_url}/${ROUTES.PRODUCT}/`, {
       method: "GET",
@@ -140,6 +148,18 @@ export const product = {
         Authorization: token,
       },
       body: JSON.stringify(jsonData),
+    });
+  },
+
+  // order by consumer
+  createOrder: async function (data) {
+    return fetch(`${config.api_url}/product/create_order/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+      body: JSON.stringify(data),
     });
   },
 };

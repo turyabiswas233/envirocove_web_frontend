@@ -5,11 +5,12 @@ import Button from "./Button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, useCore } from "../context/auth";
 import { account } from "../api/index";
+import { useProduct } from "../context/product";
 function CheckoutShip() {
   const navigate = useNavigate();
   const [address, setAddress] = useState("");
-  const [discount, setDiscount] = useState(-50);
-  const [shippingFee, setFee] = useState(150);
+  const [discount, setDiscount] = useState(0);
+  const [shippingFee, setFee] = useState(0);
   const { user, loading } = useAuth();
   const { add, load = loading } = useCore();
 
@@ -68,7 +69,7 @@ function CheckoutShip() {
           {/* address */}
           <div className="rounded-3xl bg-bg-gray p-5">
             <p className="font-medium">{fullName || "Your Name"}</p>
-            <p className="font-normal">
+            <p className="font-normal text-place">
               {address || "Your Home/Delivery Address"}
             </p>
             {willChange && (
@@ -109,6 +110,7 @@ function CheckoutShip() {
                 key={ele.productId}
                 price={Number(ele?.price || 0)}
                 number={ele?.quantity}
+                id={ele?.productId}
               />
             ))}
           </div>
@@ -151,14 +153,14 @@ function CheckoutShip() {
       </div>
     );
 }
-const EachCart = ({ price = 0, title, number = 1 }) => {
+const EachCart = ({ price = 0, number = 1, id }) => {
+  const { product: pod } = useProduct(id);
   return (
     <section className="flex justify-between gap-2 items-center my-4">
-      <div className="circle"></div>
       <div className="info flex gap-3 w-full justify-start ">
         <img src={Pic} width={100} height={100} alt="" className="rounded-xl" />
         <div className="w-full grid grid-cols-1 justify-between gap-3">
-          <p className="font-normal">{title}</p>
+          <p className="font-normal">{pod ? pod?.title : "No Name"}</p>
           {/* price part */}
           <div className="flex justify-between items-center text-sm">
             <p className="font-bold">

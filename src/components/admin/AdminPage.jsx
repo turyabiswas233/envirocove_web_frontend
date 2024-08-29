@@ -50,7 +50,7 @@ function AdminPage() {
 
     if (willHide) return;
     return (
-      <div className="fixed bottom-0 left-0 w-screen rounded-t-3xl px-4 bg-white shadow-slate-800 shadow-xl">
+      <div className="sticky bottom-0 left-0 w-full rounded-t-3xl px-4 bg-white shadow-slate-800 shadow-xl">
         <ul className="grid grid-cols-4 gap-2 justify-center">
           {links.map((link, lid) => {
             return (
@@ -105,7 +105,7 @@ function AdminPage() {
   }, [isVendor, loading]);
   if (!loading)
     return (
-      <div className="bg-bg-gray w-full h-screen overflow-y-auto">
+      <div className="bg-bg-gray relative w-full h-screen overflow-y-auto">
         <Outlet context={{ user: user }} />
         {loading && <Load />}
         <AdminNav />
