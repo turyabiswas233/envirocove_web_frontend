@@ -40,6 +40,11 @@ function Product() {
           else setImage([]);
         else setImage([]);
         console.log(res);
+        if (res?.detail === "Invalid token.") {
+          alert("Login expired");
+          localStorage.clear();
+          window.location.assign("/login");
+        }
       });
   }, [id]);
 
@@ -131,7 +136,11 @@ function Product() {
             <section className="bg-white p-2 rounded-xl">
               <Bag />
               <p className="text-gray-600 text-xs font-medium">Availability</p>
-              <p className={`text-default-gray text-sm font-semibold ${data?.quantity < 10 && 'text-red-500'}`}>
+              <p
+                className={`text-default-gray text-sm font-semibold ${
+                  (data?.quantity < 10 || !data?.quantity) && "text-red-500"
+                }`}
+              >
                 {data?.quantity} {`pc${data?.quantity > 1 ? "s" : ""}`}
               </p>
             </section>

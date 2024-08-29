@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowBack, Bkash, CreditCard, Nagad } from "./icons/icons";
+import { ArrowBack, Bkash, CODIcon, CreditCard, Nagad } from "./icons/icons";
 import Button from "./Button";
 import { Link, NavLink, useNavigate, useOutletContext } from "react-router-dom";
 import check from "/images/icons/check.svg";
@@ -23,6 +23,11 @@ function CheckoutPay() {
     2 -> Nagad
   */
   const [options, setOptions] = useState([
+    {
+      icon: <CODIcon />,
+      name: "Cash on Delivery",
+      select: false,
+    },
     {
       icon: <CreditCard />,
       name: "Credit/Debit Card",
@@ -58,6 +63,18 @@ function CheckoutPay() {
           Checkout
         </h2>
 
+        {/* message alert */}
+
+        <div className="bg-default-green/20 flex items-start gap-2 p-4 rounded-xl mb-5">
+          <p className="font-mono w-10 h-fit px-2 py-px text-center bg-default-green text-white rounded-lg">
+            i
+          </p>
+          <p className="text-title text-sm">
+            Payment with Cards, Bkash and Nagad are not available at this
+            moment. They are coming soon on upcoming updates.
+          </p>
+        </div>
+
         <div className="info grid gap-2">
           <p>
             {/* you may pass a prop of order number or generate a random unique order id */}
@@ -74,6 +91,7 @@ function CheckoutPay() {
         <div className="relative">
           {options.map((e, id) => (
             <Option
+              disabled={id > 0}
               key={e.name}
               icon={e.icon}
               name={e.name}
@@ -166,12 +184,14 @@ function CheckoutPay() {
       </div>
     );
 }
-const Option = ({ icon, name, select = false, toggle }) => {
+const Option = ({ icon, name, select = false, toggle, disabled }) => {
   return (
     <div
       className={`rounded-2xl border ${
         select == true ? "border-tBlack" : "border-border-gray"
-      } flex justify-between items-center p-5 my-2 hover:bg-bg-gray cursor-pointer transition-colors ease-in`}
+      } flex justify-between items-center p-5 my-2 hover:bg-bg-gray cursor-pointer transition-colors ease-in ${
+        disabled && "opacity-50 pointer-events-none"
+      }`}
       onClick={toggle}
     >
       <div className="method flex items-center gap-2">
