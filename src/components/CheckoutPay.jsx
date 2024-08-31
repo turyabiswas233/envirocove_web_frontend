@@ -8,7 +8,10 @@ import { product } from "../api/index";
 const itemsList = JSON.parse(localStorage.getItem("myCart"));
 const randomID = Math.floor(Math.random() * 100000);
 const totalPrice = Array.isArray(itemsList)
-  ? itemsList.reduce((p, c) => p + c?.price * c?.quantity || 0, 0)
+  ? itemsList.reduce(
+      (p, c) => p + (c?.selected ? c?.price * c?.quantity : 0),
+      0
+    )
   : 0;
 
 function CheckoutPay() {

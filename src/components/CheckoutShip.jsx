@@ -111,6 +111,7 @@ function CheckoutShip() {
                 price={Number(ele?.price || 0)}
                 number={ele?.quantity}
                 id={ele?.productId}
+                selected={ele?.selected}
               />
             ))}
           </div>
@@ -123,7 +124,7 @@ function CheckoutShip() {
             <span className="font-medium text-tBlack text-right">
               ৳{" "}
               {itemsList?.reduce(
-                (p, c) => p + c?.price * c?.quantity || 0,
+                (p, c) => p +(c?.selected ? c?.price * c?.quantity : 0 ) ,
                 discount + shippingFee
               )}
             </span>
@@ -153,25 +154,32 @@ function CheckoutShip() {
       </div>
     );
 }
-const EachCart = ({ price = 0, number = 1, id }) => {
+const EachCart = ({ price = 0, number = 1, id, selected = false }) => {
   const { product: pod } = useProduct(id);
-  return (
-    <section className="flex justify-between gap-2 items-center my-4">
-      <div className="info flex gap-3 w-full justify-start ">
-        <img src={Pic} width={100} height={100} alt="" className="rounded-xl" />
-        <div className="w-full grid grid-cols-1 justify-between gap-3">
-          <p className="font-normal">{pod ? pod?.title : "No Name"}</p>
-          {/* price part */}
-          <div className="flex justify-between items-center text-sm">
-            <p className="font-bold">
-              <span className="text-default-green">৳</span>{" "}
-              <span>{price.toFixed(2)}</span>
-            </p>
-            <p className="tracking-wider">x {number}</p>
+  if (selected)
+    return (
+      <section className="flex justify-between gap-2 items-center my-4">
+        <div className="info flex gap-3 w-full justify-start ">
+          <img
+            src={Pic}
+            width={100}
+            height={100}
+            alt=""
+            className="rounded-xl"
+          />
+          <div className="w-full grid grid-cols-1 justify-between gap-3">
+            <p className="font-normal">{pod ? pod?.title : "No Name"}</p>
+            {/* price part */}
+            <div className="flex justify-between items-center text-sm">
+              <p className="font-bold">
+                <span className="text-default-green">৳</span>{" "}
+                <span>{price.toFixed(2)}</span>
+              </p>
+              <p className="tracking-wider">x {number}</p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-  );
+      </section>
+    );
 };
 export default CheckoutShip;

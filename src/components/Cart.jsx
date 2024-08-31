@@ -5,14 +5,14 @@ import Button from "./Button";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/auth";
 
-const Counter = ({ number, id, setItemNumber }) => {
+const Counter = ({ number, id, setItemNumber, willWork }) => {
   const [num, setNum] = useState(number);
   const increament = () => {
-    if (num < 7) setNum((pre) => pre + 1);
+    if (willWork) if (num < 7) setNum((pre) => pre + 1);
   };
 
   const decreament = () => {
-    if (num > 1) setNum((pre) => pre - 1);
+    if (willWork) if (num > 1) setNum((pre) => pre - 1);
   };
 
   useEffect(() => {
@@ -62,18 +62,20 @@ const Counter = ({ number, id, setItemNumber }) => {
 };
 const EachCart = ({
   id,
+  did,
   number,
   price,
   title,
   setItemNumber,
   setTotal,
-  arr,
-  setArr,
+  selected,
+  setData,
 }) => {
   useEffect(() => {
     setTotal(0);
     setTotal((pre) => pre + price);
   }, [price]);
+
   return (
     <section
       className="flex justify-between gap-2 items-center my-4"
@@ -83,13 +85,14 @@ const EachCart = ({
     >
       <div
         className={`circle transition-colors ${
-          arr.find((p) => p === id) && "bg-default-green/70"
+          selected && "bg-default-green/70"
         }`}
         onClick={() => {
-          setArr((pre) => {
-            if (pre.find((p) => p === id)) return pre.filter((p) => p !== id);
-            return [...pre, id];
-          });
+          setData((pre) =>
+            pre.map((ele, eid) =>
+              eid !== did ? ele : { ...ele, selected: !selected }
+            )
+          );
         }}
       ></div>
       <div className="info flex gap-3 w-full justify-start ">
@@ -102,7 +105,12 @@ const EachCart = ({
               <span className="text-default-green">৳</span>{" "}
               <span>{price.toFixed(2)}</span>
             </p>
-            <Counter number={number} id={id} setItemNumber={setItemNumber} />
+            <Counter
+              number={number}
+              id={id}
+              setItemNumber={setItemNumber}
+              willWork={selected}
+            />
           </div>
         </div>
       </div>
@@ -114,6 +122,7 @@ const Cart = () => {
 
   const [totalPrice, setTotal] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const [arrLen, setArrLen] = useState(0);
 
   const [data, setData] = useState([]);
   const { user, loading } = useAuth();
@@ -128,16 +137,25 @@ const Cart = () => {
       } else setData([]);
     } else setData([]);
   }, []);
-
-  useEffect(() => {
+  const handlePrice = (data) => {
     if (Array.isArray(data)) {
       setTotal(0);
       setTotal(
-        data.reduce((p, c) => p + (c?.price * c?.quantity) || 0, 0)
+        data.reduce(
+          (p, c) => p + (c?.selected ? c?.price * c?.quantity : 0) || 0,
+          0
+        )
       );
     }
+  };
+  useEffect(() => {
+    handlePrice(data);
   }, [data]);
-  const [arr, setArr] = useState([]);
+
+  useEffect(() => {
+    localStorage.setItem("myCart", JSON.stringify(data));
+    setArrLen(data.filter((ele) => ele.selected === true).length);
+  }, [data]);
 
   if (!loading)
     return (
@@ -164,16 +182,19 @@ const Cart = () => {
             <header className="flex gap-2 items-center border-b border-border-gray py-6">
               <div
                 className={`circle transition-colors ${
-                  data.length === arr.length && "bg-default-green/70"
+                  data.reduce((p, c) => p + (c.selected ? 1 : 0), 0) ==
+                    data.length && "bg-default-green/70"
                 }`}
                 onClick={() => {
-                  if (arr.length != data.length)
-                    setArr(
-                      data?.map((ele) => {
-                        return ele?.productId;
-                      })
-                    );
-                  else setArr([]);
+                  if (arrLen != data.length) {
+                    setData((pre) => {
+                      return pre.map((ele) => ({ ...ele, selected: true }));
+                    });
+                  } else {
+                    setData((pre) => {
+                      return pre.map((ele) => ({ ...ele, selected: false }));
+                    });
+                  }
                 }}
               ></div>
               <p className="font-medium text-base break-words">
@@ -185,14 +206,16 @@ const Cart = () => {
                 return (
                   <EachCart
                     key={`items-${id}`}
-                    number={ele?.quantity}
+                    did={id}
                     id={ele?.productId}
+                    number={ele?.quantity}
                     title={ele?.title}
+                    selected={ele?.selected}
                     price={Number(ele?.price || 0)}
                     setItemNumber={setData}
                     setTotal={setTotal}
-                    arr={arr}
-                    setArr={setArr}
+                    data={data}
+                    setData={setData}
                   />
                 );
               })}

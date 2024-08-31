@@ -237,6 +237,7 @@ function Product() {
                   title: data?.title,
                   quantity: num,
                   price: data?.price ? Number(data?.price) : 0,
+                  selected: false,
                 });
                 localStorage.setItem("myCart", JSON.stringify(cartList));
                 alert("Item added to your cart");
@@ -251,6 +252,7 @@ function Product() {
                         title: data?.title,
                         quantity: num,
                         price: data?.price ? Number(data?.price) : 0,
+                        selected: false,
                       },
                     ])
                   );
