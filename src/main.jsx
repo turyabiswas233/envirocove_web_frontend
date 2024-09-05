@@ -37,11 +37,11 @@ const rootRouter = createBrowserRouter([
     ),
     children: [
       {
-        path: '/',
+        path: '/account',
         element: <Home />,
       },
       {
-        path: "/dashboard",
+        path: "/",
         element: <Consumer />,
       },
       {

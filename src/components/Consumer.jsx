@@ -4,12 +4,14 @@ import Pic from "../assets/triod.png";
 import { useNavigate } from "react-router-dom";
 import { product, account } from "../api/index";
 import { useCategory } from "../context/product";
+import { TbLogout } from "react-icons/tb";
+
 function Consumer() {
   const [tab, setTab] = useState(0);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
-  const { category : tabs } = useCategory();
+  const { category: tabs } = useCategory();
 
   useEffect(() => {
     account
@@ -50,13 +52,16 @@ function Consumer() {
             <CartIcon />
           </button>
           <button
-            className="rounded-full bg-rose-400 p-2 justify-center items-center flex"
+            className="rounded-full bg-white p-2 justify-center items-center flex"
             onClick={() => {
-              localStorage.clear();
-              window.location.assign("/");
+              if (localStorage.getItem("TOKEN")) {
+                localStorage.removeItem("TOKEN");
+                window.location.assign("/");
+              } else 
+              window.location.assign("/login");
             }}
           >
-            logout
+            <TbLogout />
           </button>
         </section>
       </div>

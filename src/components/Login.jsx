@@ -6,22 +6,14 @@ import { account } from "../api/index";
 import { useAuth } from "../context/auth";
 function Login() {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const [resentOTP, setOTPtimer] = useState(0);
   const [btnStatus, setbtnStatus] = useState("Login");
   const [userInfo, setInfo] = useState({
     phone: "",
     otp: "",
   });
-  useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        console.warn("user is not logged in");
-        return;
-      }
-      // navigate("/dashboard");
-    }
-  }, [user, loading]);
+
   useEffect(() => {
     if (resentOTP > 0) {
       const loop = setInterval(() => {
@@ -64,7 +56,7 @@ function Login() {
             clearTimeout(loop);
             setbtnStatus("Login");
             localStorage.setItem("TOKEN", `Token ${res.token}`);
-            navigate("/dashboard");
+            navigate("/");
           }, 2000);
         }
       })
@@ -86,7 +78,11 @@ function Login() {
       </div>
 
       <div className="my-12">
-        <button className="w-full rounded-full border border-black hover:bg-opa-green/50 transition-colors text-base flex justify-center items-center py-4 gap-2 font-medium">
+        <button
+          className="w-full rounded-full border border-black hover:bg-opa-green/50 transition-colors text-base flex justify-center items-center py-4 gap-2 font-medium"
+          type="button"
+          onClick={() => alert("Not available")}
+        >
           <Google /> Continue with Google
         </button>
       </div>

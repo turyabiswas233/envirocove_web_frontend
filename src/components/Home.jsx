@@ -33,7 +33,7 @@ const Home = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading) if (user) navi("/dashboard");
+    if (!loading) if (user) navi("/");
   }, [user, loading]);
 
   const [selectedOption, setSelectedOption] = useState(1);

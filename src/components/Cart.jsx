@@ -163,7 +163,7 @@ const Cart = () => {
         {/* header */}
         <div className="py-6 px-5 flex justify-between gap-5">
           <h2 className="font-bold text-left text-3xl w-fit flex items-center gap-4">
-            <Link to={"/dashboard"}>
+            <Link to={"/"}>
               <ArrowBack />
             </Link>
             Cart
@@ -271,7 +271,7 @@ const Cart = () => {
                   className={
                     "text-white bg-default-green rounded-full px-4 capitalize hover:bg-green-700"
                   }
-                  to="/dashboard"
+                  to="/"
                 >
                   product list
                 </NavLink>{" "}

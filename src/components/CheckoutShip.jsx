@@ -124,7 +124,7 @@ function CheckoutShip() {
             <span className="font-medium text-tBlack text-right">
               ৳{" "}
               {itemsList?.reduce(
-                (p, c) => p +(c?.selected ? c?.price * c?.quantity : 0 ) ,
+                (p, c) => p + (c?.selected ? c?.price * c?.quantity : 0),
                 discount + shippingFee
               )}
             </span>
@@ -145,10 +145,20 @@ function CheckoutShip() {
         <Button
           classes={"w-full text-center py-5 mt-5"}
           text={"Continue"}
-          onclick={() => {
+          onclick={async () => {
             if (fullName.length == 0 || address.length == 0)
               alert("Please provide your full name and home/delivery address.");
-            else navigate("/checkout/pay");
+            else {
+              try {
+                const hasToken = localStorage.getItem("TOKEN");
+                if (!hasToken) {
+                  alert("You are not logged in.");
+                  navigate("/login");
+                } else navigate("/checkout/pay");
+              } catch (error) {
+                console.log(error);
+              }
+            }
           }}
         />
       </div>

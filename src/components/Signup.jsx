@@ -25,7 +25,7 @@ function Signup() {
     if (TOKEN) {
       console.warn("TOKEN FOUND");
       console.log("state", location.state);
-      navigate("/dashboard");
+      navigate("/");
     } else localStorage.clear();
   }, [TOKEN]);
 
@@ -63,9 +63,9 @@ function Signup() {
                 console.log(err);
               })
               .finally(() => {
-                navigate("/dashboard");
+                navigate("/");
               });
-          else navigate("/dashboard");
+          else navigate("/");
         } else {
           alert("Registration failed");
           console.log(data);
@@ -86,7 +86,11 @@ function Signup() {
       </div>
 
       <div className="my-12">
-        <button className="w-full rounded-full border border-black hover:bg-opa-green/50 transition-colors text-base flex justify-center items-center py-4 gap-2 font-medium">
+        <button
+          className="w-full rounded-full border border-black hover:bg-opa-green/50 transition-colors text-base flex justify-center items-center py-4 gap-2 font-medium"
+          type="button"
+          onClick={() => alert("Not available")}
+        >
           <Google /> Continue with Google
         </button>
       </div>

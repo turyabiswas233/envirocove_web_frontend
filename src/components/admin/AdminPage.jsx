@@ -95,7 +95,7 @@ function AdminPage() {
   useEffect(() => {
     if (!loading) {
       if (isVendor === false) {
-        navi("/dashboard", {
+        navi("/", {
           state: {
             adminError: "You are not a vendor user",
           },
