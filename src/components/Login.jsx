@@ -94,27 +94,20 @@ function Login() {
       <div className="my-12 text-title">
         <form className="signup grid gap-5" onSubmit={handleSubmit}>
           <div className="input">
-            <label htmlFor="phone">{"Phone number/Username"}</label>
-            <div className="border border-neutral-400 placeholder:text-neutral-400 px-5 py-3 rounded-3xl focus-within:outline outline-offset-0 focus-within:border-transparent focus-within:outline-green-500 outline-none flex items-center overflow-x-hidden">
-              <span>+880</span>
-              <span className="px-[.75px] h-10 bg-gray-700 mx-4"></span>
-              <input
-                className="outline-none flex-1"
-                type="text"
-                id="phone"
-                required
-                placeholder="1768952448 | username"
-                name="phone"
-                value={userInfo.phone}
-                onChange={handleInput}
-                onKeyDown={(e) => {
-                  // if (e.key < "0" || e.key > "9") {
-                  //   if (e.key != "Backspace") e.preventDefault();
-                  // }
-                }}
-              />
-            </div>
+            <label htmlFor="phone">{"Email Address"}</label>
+
+            <input
+              className="outline-none flex-1"
+              type="text"
+              id="phone"
+              required
+              placeholder="Enter your email"
+              name="phone"
+              value={userInfo.phone}
+              onChange={handleInput}
+            />
           </div>
+
           <div className="input relative">
             <label htmlFor="otp">Password</label>
             <input

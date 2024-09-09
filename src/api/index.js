@@ -3,13 +3,12 @@ import { config } from "./config";
 const token = localStorage.getItem("TOKEN"); // ami token pass na kore ekhan theke get kortesi
 
 export const account = {
-  setType: async function (type, tk) {
-    console.log(tk);
+  setType: async function (type) {
     return fetch(`${config.api_url}/${ROUTES.CORE.SET_TYPE}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Token ${tk}`,
+        Authorization: token,
       },
       body: JSON.stringify({ type: type }),
     });

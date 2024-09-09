@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Button from "./Button";
+import { LuLoader } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/auth";
+import { account } from "../api";
 const CardSelect = ({ id, select = false, title, text, onClick }) => {
   return (
     <div
@@ -32,11 +34,9 @@ const Home = () => {
 
   const { user, loading } = useAuth();
 
-  useEffect(() => {
-    if (!loading) if (user) navi("/");
-  }, [user, loading]);
-
   const [selectedOption, setSelectedOption] = useState(1);
+  const [load, setload] = useState(false);
+  const [error, seterror] = useState("");
   const [data, setData] = useState([
     {
       title: "As a vendor",
@@ -62,7 +62,22 @@ const Home = () => {
       return newArrar;
     });
   };
-
+  if (!user) {
+    return (
+      <div className="py-32 px-4 w-auto bg-white flex justify-center items-center">
+        <div className="bg-white shadow-xl shadow-slate-800/50 p-10 rounded-xl">
+          <p>You are not logged in</p>
+          <p>
+            Go to <a href="/signup">Sign Up</a> page and create a new account.
+          </p>
+          <p>or</p>
+          <p>
+            Go to <a href="/login">Login</a> page and login to your account.
+          </p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="py-32 px-4 w-auto bg-white">
       <div className="header grid grid-cols-1 gap-5">
@@ -84,16 +99,52 @@ const Home = () => {
             />
           );
         })}
-
+        {error && (
+          <p className="text-red-600 bg-red-50 text-base rounded-md border border-red-600 p-2 mb-4">
+            {error}
+          </p>
+        )}
         <Button
           text={"Sign up"}
-          onclick={() =>
-            navi("/signup", {
-              state: {
-                type: data[selectedOption].type.toLowerCase(),
-              },
-            })
-          }
+          type={"button"}
+          icon={<LuLoader className="animate-spin" />}
+          disabled={load}
+          onclick={async (e) => {
+            e.preventDefault();
+            // type: data[selectedOption].type.toLowerCase(),
+            try {
+              setload(true);
+              seterror("");
+              if (data[selectedOption].type.toLocaleLowerCase() === "vendor") {
+                const response = await account
+                  .setType("vendor")
+                  .then((res) => res.json());
+                console.log(response);
+                if (response?.message === "success") {
+                  alert(
+                    "You have successfully created an account as a vendor."
+                  );
+                  navi("/");
+                }
+
+                seterror(
+                  response?.error || response?.details || "An error occured"
+                );
+
+                // navi("/");
+              } else {
+                setload(true);
+                alert(
+                  "You have successfully created an account as a consumer."
+                );
+                navi("/");
+              }
+            } catch (error) {
+              console.log(error);
+            } finally {
+              setload(false);
+            }
+          }}
           classes={"w-full py-3 font-semibold"}
         />
       </div>

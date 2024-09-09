@@ -9,6 +9,18 @@ import {
 } from "react-router-dom";
 import { account } from "../api/index";
 
+const hasNumber = (password = "") => {
+  return RegExp(/[0-9]/).test(password);
+};
+const hasCapital = (password = "") => {
+  return RegExp(/[A-Z]/).test(password);
+};
+const hasSmall = (password = "") => {
+  return RegExp(/[a-z]/).test(password);
+};
+const jingaLalaHu = (pass) => {
+  return hasCapital(pass) && hasNumber(pass) && hasSmall(pass);
+};
 function Signup() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,43 +50,45 @@ function Signup() {
   }
   async function handleSignUp(e) {
     e.preventDefault();
-    const fname = userInfo.fName.split(" ", 2);
-
-    account
-      .register({
-        username: userInfo.email.split("@")[0],
-        email: userInfo.email,
-        password: userInfo.pass,
-        first_name: fname[0],
-        last_name: fname[1] || ", ",
-      })
-      .then((res) => res.json())
-      .then((data) => {
-        const token = data.token;
-        if (token) {
-          localStorage.setItem("TOKEN", `Token ${token}`);
-          alert("Registration successful");
-          if (location.state?.type === "vendor")
-            account
-              .setType("vendor", token)
-              .then((res) => res.json())
-              .then((res) => console.log(res))
-              .catch((err) => {
-                console.log(err);
-              })
-              .finally(() => {
-                navigate("/");
-              });
-          else navigate("/");
-        } else {
-          alert("Registration failed");
-          console.log(data);
-          setError(data);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const fname = userInfo.fName.split(" ");
+    const FLName =
+      fname.length < 3
+        ? {
+            first_name: fname[0],
+            last_name: fname[1] || " ",
+          }
+        : {
+            first_name: fname[0] + " " + fname[1],
+            last_name: fname.join(" ").split(" ", 3)[2],
+          };
+    try {
+      account
+        .register({
+          username: userInfo.email,
+          email: userInfo.email,
+          password: userInfo.pass,
+          first_name: fname[0],
+          last_name: fname[1] || " ",
+        })
+        .then((res) => res.json())
+        .then((data) => {
+          const token = data.token;
+          if (token) {
+            localStorage.setItem("TOKEN", `Token ${token}`);
+            // alert("Registration successful");
+            navigate("/account/setType");
+          } else {
+            alert("Registration failed");
+            console.log(data);
+            setError(data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (error) {
+      console.log("error", error);
+    }
   }
 
   return (
@@ -142,21 +156,54 @@ function Signup() {
               minLength={8}
               required
               name="pass"
+              autoComplete="off"
               onChange={handleInput}
             />
             <div className="py-0">
               <p className="text-sm">Tips:</p>
-              <ol className="px-5 list-decimal text-green-700 text-sm">
-                <li>length a least 8 </li>
-                <li>contains capital case[A-Z]</li>
-                <li>contains small case[a-z]</li>
-                <li>contains numbers[0-9]</li>
+              <ol className="px-5 list-decimal text-sm">
+                <li
+                  className={`transition-colors duration-500 ${
+                    userInfo.pass.length < 8
+                      ? "text-red-700 opacity-70"
+                      : "text-green-600"
+                  }`}
+                >
+                  length a least 8
+                </li>
+                <li
+                  className={`transition-colors duration-500 ${
+                    !hasCapital(userInfo.pass)
+                      ? "text-red-700 opacity-70"
+                      : "text-green-600"
+                  }`}
+                >
+                  contains capital case[A-Z]
+                </li>
+                <li
+                  className={`transition-colors duration-500 ${
+                    !hasSmall(userInfo.pass)
+                      ? "text-red-700 opacity-70"
+                      : "text-green-600"
+                  }`}
+                >
+                  contains small case[a-z]
+                </li>
+                <li
+                  className={`transition-colors duration-500 ${
+                    !hasNumber(userInfo.pass)
+                      ? "text-red-700 opacity-70"
+                      : "text-green-600"
+                  }`}
+                >
+                  contains numbers[0-9]
+                </li>
               </ol>
             </div>
           </div>
           <div className="agreement flex items-center gap-3">
             <div
-              className={`${
+              className={`scale-75 ${
                 !isAgree ? "bg-gray-300/70" : "bg-default-green"
               } border rounded-lg p-1 w-8 h-8 transition-colors duration-300`}
               onClick={toggleAgree}
@@ -167,7 +214,7 @@ function Signup() {
               }
             >
               <div
-                className={`w-3 h-1 origin-left translate-y-2 rounded-full ${
+                className={`w-2 h-1 origin-left translate-y-2.5 translate-x-0.5 rounded-full ${
                   isAgree ? "bg-white" : "bg-slate-400"
                 } rotate-45`}
               ></div>
@@ -179,8 +226,20 @@ function Signup() {
             </div>
 
             <p>
-              I agree to the <a href="#">Terms of Service</a> &{" "}
-              <a href="#">Privacy Policy</a>
+              I agree to the{" "}
+              <a
+                href="#"
+                className="underline text-black decoration-black underline-offset-1"
+              >
+                Terms of Service
+              </a>{" "}
+              &{" "}
+              <a
+                href="#"
+                className="underline text-black decoration-black underline-offset-1"
+              >
+                Privacy Policy
+              </a>
             </p>
           </div>
           <Button

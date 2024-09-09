@@ -37,7 +37,7 @@ const rootRouter = createBrowserRouter([
     ),
     children: [
       {
-        path: '/account',
+        path: '/account/setType',
         element: <Home />,
       },
       {
